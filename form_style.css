@@ -1,0 +1,60 @@
+.form-container {
+    width: 300px;
+    margin: 0 auto;
+    padding: 50px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    max-height: 100%;
+  }
+  
+  /* Stile per le etichette */
+  .label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  /* Stile per gli input */
+  .input-field {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  /* Stile per il pulsante di invio */
+  .submit-button {
+    width: 100px;
+    margin: 0 auto;
+    display: block;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007BFF;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .submit-button:hover {
+    background-color: #0056b3;
+  }
+
+  span {
+    text-align: center;
+    width: 150px;
+    margin: 0 auto;
+    display: block;
+    color: rgb(190, 50, 50);
+    font-weight: bold;
+    padding: 15px;
+  }
+
+  h3{
+    text-align: center;
+    width: 300px;
+    margin: 0 auto;
+    display: block;
+    margin-top: 10px;
+  }
