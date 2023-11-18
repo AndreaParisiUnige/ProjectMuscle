@@ -1,21 +1,40 @@
+<!--
+L'accesso alla pagina è consentito solo agli utenti registrati e loggati.
+E' possibile accedervi anche in presenza di un cookie di autenticazione valido.
+Il controllo effettuato sul cookie di autenticazione trovato verifica l'esistenza e la scadenza dello stesso
+In caso di cookie valido vengono settati i parametri di sessione che permetteranno l'accesso alla pagina.
+-->
+
 <?php
 session_start();
 ob_start();
-?>
-
-<?php
 require_once 'header.php';
 require_once 'navbar.php';
+require_once 'connection.php';
+require_once 'query.php';
 ?>
 
+<?php   
+    
+    if ((isset($_COOKIE["token"]) && checkValideCookie($_COOKIE["token"], $con)) 
+        || $_SESSION["logged_in"]) {
+        echo '<h1 style="text-align: center;">Welcome to the reserved page!</h1>';
+        echo '<p style="text-align: center;">Logged in as: ' . $_SESSION["email"] . '</p>';
+    } 
+    else {
+        echo '<p>You must be logged in to access this page.</p>';
 
-<?php
-if (!isset($_SESSION["logged_in"])) {
-    echo '<p>You must be logged in to access this page.</p>';
-    header("Location: login.php");
-    exit;
-} else if ($_SESSION["logged_in"])
-    echo '<h1 style="text-align: center;">Welcome to the reserved page!</h1>';
-    echo '<p style="text-align: center;">Logged in as: ' . $_SESSION["email"] . '</p>';
-require_once 'footer.php';
+        $accessDetails = [
+            'timestamp' => date('Y-m-d H:i:s'),
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+            'ip_address' => $_SERVER['REMOTE_ADDR'],
+        ];
+        $accessDetailsJSON = json_encode($accessDetails);
+        error_log("User tried to access reserved page without being logged in: $accessDetailsJSON\n", 3, "error.log");
+
+        header("Location: login.php");
+        exit;
+    } 
+
+    require_once 'footer.php';
 ?>

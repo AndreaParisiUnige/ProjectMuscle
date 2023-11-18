@@ -7,6 +7,7 @@ ob_start();
 require_once 'header.php';
 require_once 'navbar.php';
 require_once 'utils.php';
+set_error_handler("errorHandler");
 ?>
 
 <div class="form-container">
@@ -17,6 +18,9 @@ require_once 'utils.php';
 
 		<label for="pass" class="label">Password:</label>
 		<input type="password" id="pass" name="pass" class="input-field" required>
+
+		<label for="checkbox" class="label">Remember Me:</label>
+		<input type="checkbox" id="checkbox" name="checkbox" class="input-field">
 
 		<input type="submit" value="Submit" class="submit-button">
 	</form>
@@ -35,7 +39,7 @@ require_once 'utils.php';
 			require_once 'query.php';
 
 			$email = trim($_POST["email"]);
-			$clean_pass = trim(($_POST["pass"]));
+			$clean_pass = trim(($_POST["pass"]));			
 
 			// Ricerco l'utente nel database, se non esiste $user[0] sarà 0
 			$user = get_pwd_fromUser($email, $con);
@@ -48,7 +52,8 @@ require_once 'utils.php';
 			$_SESSION["logged_in"] = true;
 			$_SESSION["email"] = $email;
 			$_SESSION["admin"] = $user[1];
-
+					
+			require_once 'setcookie.php';
 			mysqli_close($con);
 			header("Location: reserved.php");
 		}

@@ -33,6 +33,12 @@ require_once 'navbar.php';
 	<?php
 	try{
 		checkSessionError();
+
+		if(isset($_SESSION["email"])){
+			header("Location: index.php");
+			exit;
+		}
+
 		if ($_SERVER["REQUEST_METHOD"] === "POST") {
 			
 			checkNotEmptyParams($_POST["firstname"], $_POST["lastname"], $_POST["email"], $_POST["pass"], $_POST["confirm"]);

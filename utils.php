@@ -50,11 +50,14 @@ function check_mysqliGetResultReturn($return, $con){
     }
 }
 
+// Rimozione errori e warning da pagina utente
 function errorHandler($errstr, $errfile, $errline) {
     echo "<span>Si è verificato un problema. Si prega di riprovare più tardi</span>";
     error_log("Errore o warning: $errstr in $errfile alla riga $errline", 3, "error.log");
 }
 
+// Per verificare la presenza di errori memorizzati nella sessione, ad esempio
+// dalla precedente pagina di login
 function checkSessionError(){
     if (isset($_SESSION['error_message'])) {
         echo "<span>" . $_SESSION['error_message'] . "</span>";
