@@ -34,7 +34,7 @@ require_once 'navbar.php';
 	try{
 		checkSessionError();
 
-		if(isset($_SESSION["email"])){
+		if(isset($_SESSION["logged_in"])){
 			header("Location: index.php");
 			exit;
 		}
