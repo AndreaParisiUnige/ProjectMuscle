@@ -29,11 +29,12 @@ function get_pwd_fromUser($email, $con){
     check_mysqliPrepareReturn($get_pwd = mysqli_prepare($con, "SELECT password, admin FROM users WHERE email=?"), $con);
     check_mysqliBindReturn(mysqli_stmt_bind_param($get_pwd, "s", $email), $con);
     check_mysqliExecuteReturn(mysqli_stmt_execute($get_pwd), $con);
-    if($result = mysqli_stmt_get_result($get_pwd)){
+    $result = mysqli_stmt_get_result($get_pwd);
+    if(mysqli_num_rows($result) > 0){
         $row = mysqli_fetch_array($result);
         return array ($row["password"], $row["admin"]);
     }
-    return array ();
+    return null;
 }
 
 function delete_user($id, $con){
@@ -86,8 +87,9 @@ function checkValideCookie($token, $con){
 
     check_mysqliBindReturn(mysqli_stmt_bind_param($check_cookie_stmt, "s", $token), $con);
     check_mysqliExecuteReturn(mysqli_stmt_execute($check_cookie_stmt), $con);
+    $result = mysqli_stmt_get_result($check_cookie_stmt);
 
-    if($result = mysqli_stmt_get_result($check_cookie_stmt)){
+    if(mysqli_num_rows($result) > 0){
         $row = mysqli_fetch_array($result);
         if ($row["remember_me_enabled"] && $row["rememberMeToken"] == $token && strtotime($row["cookie_expiration"]) > time()) {
             $_SESSION["logged_in"] = true;

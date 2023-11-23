@@ -52,8 +52,8 @@ function check_mysqliGetResultReturn($return, $con){
 
 // Rimozione errori e warning da pagina utente
 function errorHandler($errstr, $errfile, $errline) {
-    echo "<span>Si è verificato un problema. Si prega di riprovare più tardi</span>";
-    error_log("Errore o warning: $errstr in $errfile alla riga $errline", 3, "error.log");
+    echo "<span>Si è verificato un problema. Si prega di riprovare più tardi\n</span>";
+    error_log("Errore o warning: $errstr in $errfile alla riga $errline\n", 3, "error.log");
 }
 
 // Per verificare la presenza di errori memorizzati nella sessione, ad esempio

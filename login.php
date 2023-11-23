@@ -41,21 +41,23 @@ set_error_handler("errorHandler");
 			$email = trim($_POST["email"]);
 			$clean_pass = trim(($_POST["pass"]));			
 
-			// Ricerco l'utente nel database, se non esiste $user[0] sarà 0
+			// Ricerco l'utente nel database, se non esiste $user sarà null
 			$user = get_pwd_fromUser($email, $con);
-			if(empty($user) || !password_verify($clean_pass, $user[0])){
-				$_SESSION["error_message"] = "Errore: email o password errati";
-				header("Location: login.php");				
-				exit;
-			}
-			
-			$_SESSION["logged_in"] = true;
-			$_SESSION["email"] = $email;
-			$_SESSION["admin"] = $user[1];
+			if(!empty($user))
+				if(password_verify($clean_pass, $user[0])){
+					$_SESSION["logged_in"] = true;
+					$_SESSION["email"] = $email;
+					$_SESSION["admin"] = $user[1];
 					
-			require_once 'setcookie.php';
-			mysqli_close($con);
-			header("Location: reserved.php");
+					require_once 'setcookie.php';
+					mysqli_close($con);
+					header("Location: reserved.php");
+					exit;				
+			}
+			$_SESSION["error_message"] = "Errore: email o password errati\n";
+			header("Location: login.php");				
+			exit;
+
 		}
 	} catch (Exception $e){
 		echo "<span>Something went wrong</span>";
