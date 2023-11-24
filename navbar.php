@@ -2,7 +2,10 @@
     <ul>
         <li><a href="index.php">Home</a></li>
         <?php
-        if (isset($_SESSION["logged_in"]) || isset($_COOKIE["token"])) {
+        require_once 'connection.php';
+        require_once 'query.php';
+
+        if (isset($_SESSION["logged_in"]) || isset($_COOKIE["token"]) && checkValideCookie($_COOKIE["token"], $con)) {
             if(isset($_SESSION["admin"]) && $_SESSION["admin"]==1)
                 echo '<li><a href="allusers.php">Show all users</a></li>';
             echo '<li><a href="profile.php">Show profile</a></li>';

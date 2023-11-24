@@ -8,6 +8,41 @@ require_once 'header.php';
 require_once 'navbar.php';
 ?>
 
+<?php
+if ((isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) || (isset($_COOKIE["token"]) && checkValideCookie($_COOKIE["token"], $con))) {
+	header("Location: index.php");
+	exit;
+}
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+	checkNotEmptyParams($_POST["firstname"], $_POST["lastname"], $_POST["email"], $_POST["pass"], $_POST["confirm"]);
+	validateEmail($_POST["email"]);
+	validatePassword($_POST["pass"], $_POST["confirm"]);
+
+	try {
+		require_once 'connection.php';
+		require_once 'query.php';
+		$hash =  password_hash(trim(($_POST["pass"])), PASSWORD_DEFAULT);
+		if (insert_user_data($_POST["firstname"], $_POST["lastname"], trim($_POST["email"]), $hash, $con)) {
+			$_SESSION['message'] = '<span>Registrazione completata<span>';
+			header("Location: login.php");
+			exit;
+		}	
+	} 
+	catch (Exception $e) {
+		if (mysqli_errno($con) == 1062)	
+			$_SESSION['error_message'] = "<span>Errore:account già registrato</span>";
+		else
+			$_SESSION['error_message'] = "<span>Something went wrong</span>";
+		error_log("Failed to insert user data into the database: " . $e->getMessage() . "\n", 3, "error.log");
+		reloadPage();
+	}
+	mysqli_close($con);
+	exit;
+}
+?>
+
 <div class="form-container">
 	<h1>Inserisci i tuoi dati</h1>
 	<form action="registration.php" method="post">
@@ -31,38 +66,7 @@ require_once 'navbar.php';
 	</form>
 
 	<?php
-	try{
-		checkSessionError();
-
-		if(isset($_SESSION["logged_in"])){
-			header("Location: index.php");
-			exit;
-		}
-
-		if ($_SERVER["REQUEST_METHOD"] === "POST") {
-			
-			checkNotEmptyParams($_POST["firstname"], $_POST["lastname"], $_POST["email"], $_POST["pass"], $_POST["confirm"]);
-			validateEmail($_POST["email"]);
-			validatePassword($_POST["pass"], $_POST["confirm"]);
-
-			require_once 'connection.php';
-			require_once 'query.php';
-
-			$hash =  password_hash(trim(($_POST["pass"])), PASSWORD_DEFAULT);
-			insert_user_data($_POST["firstname"], $_POST["lastname"], trim($_POST["email"]), $hash, $con);
-
-			mysqli_close($con);
-		}
-	} catch (Exception $e){
-		if (mysqli_errno ($con) == 1062) {
-		echo "<span>Errore:Un account con questo indirizzo email è già stato registrato</span>";
-		error_log("Failed to insert user data into the database: ".$e->getMessage()."\n", 3, "error.log");
-		}
-		else{
-			echo "<span>Something went wrong</span>";
-			error_log("Failed to insert user data into the database: ".$e->getMessage()."\n", 3, "error.log");
-		}
-	}
+	checkSessionError();
 	?>
 </div>
 

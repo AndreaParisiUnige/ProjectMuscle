@@ -10,14 +10,15 @@ session_start();
 ob_start();
 require_once 'header.php';
 require_once 'navbar.php';
+checkSessionError();
 require_once 'connection.php';
 require_once 'query.php';
 ?>
 
 <?php   
-    
+    //TESTED
     if ((isset($_COOKIE["token"]) && checkValideCookie($_COOKIE["token"], $con)) 
-        || $_SESSION["logged_in"]) {
+        || isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) {
         echo '<h1 style="text-align: center;">Welcome to the reserved page!</h1>';
         echo '<p style="text-align: center;">Logged in as: ' . $_SESSION["email"] . '</p>';
     } 
@@ -25,7 +26,7 @@ require_once 'query.php';
         echo '<p>You must be logged in to access this page.</p>';
 
         $accessDetails = [
-            'timestamp' => date('Y-m-d H:i:s'),
+            'timestamp' => date('d-m-Y H:i:s'),
             'user_agent' => $_SERVER['HTTP_USER_AGENT'],
             'ip_address' => $_SERVER['REMOTE_ADDR'],
         ];
@@ -36,5 +37,5 @@ require_once 'query.php';
         exit;
     } 
 
-    require_once 'footer.php';
+require_once 'footer.php';
 ?>
