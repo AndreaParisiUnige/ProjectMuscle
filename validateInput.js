@@ -14,7 +14,7 @@ function createErrorNode(element, message, errorClass, errorId) {
 function toggleError(fieldNode, errorNode, addError) {
     if (addError) {
         fieldNode.style.border = '2px solid red';
-        fieldNode.parentNode.insertBefore(errorNode, fieldNode.nextSibling);
+        fieldNode.insertAdjacentElement('afterend', errorNode);
     } else {
         fieldNode.style.border = '';
         if (errorNode) {
@@ -34,20 +34,13 @@ function emptyParams(e, ...params) {
         if (fieldValue === '') {
             e.preventDefault();
             if (!emptyFieldErrorNode) {
-                var errorNode = createErrorNode(
-                    element,
-                    ErrorMessages.EMPTY_FIELD,
-                    'emptyField',
-                    ''
-                );
+                var errorNode = createErrorNode( element, ErrorMessages.EMPTY_FIELD, 'emptyField', '');
                 toggleError(fieldNode, errorNode, true);
                 empty = true;
             }
-        } else if (emptyFieldErrorNode) {
+        } else if (emptyFieldErrorNode) 
             toggleError(fieldNode, emptyFieldErrorNode, false);
-        }
     });
-
     return empty;
 }
 
@@ -60,18 +53,15 @@ function correspondingPass(e) {
     if (pass !== confirm) {
         e.preventDefault();
         if (!passMatchErrorNode) {
-            var errorNode = createErrorNode(
-                'confirm',
-                ErrorMessages.PASSWORD_MISMATCH,
-                'wrongPass',
-                'NotMatch'
-            );
+            var errorNode = createErrorNode('confirm', ErrorMessages.PASSWORD_MISMATCH, 'wrongPass', 'NotMatch');
             toggleError(confirmNode, errorNode, true);
         }
-    } else if (passMatchErrorNode) {
+    } else if (passMatchErrorNode) 
         toggleError(confirmNode, passMatchErrorNode, false);
-    }
 }
+
+
+
 
 const path = window.location.pathname;
 const pageName = path.split('/').pop();

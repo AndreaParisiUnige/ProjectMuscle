@@ -49,13 +49,13 @@ require_once 'navbar.php';
 	<h1>Inserisci i tuoi dati</h1>
 	<form action="login.php" method="post">
 		<label for="email" class="label">Email:</label>
-		<input type="email" id="email" name="email" class="input-field" required>
+		<input type="email" id="email" name="email" class="input-field" placeholder="Enter your email">
 
 		<label for="pass" class="label">Password:</label>
-		<input type="password" id="pass" name="pass" class="input-field" required>
+		<input type="password" id="pass" name="pass" class="input-field" placeholder="Enter your password">
 
 		<label for="checkbox" class="label">Remember Me:</label>
-		<input type="checkbox" id="checkbox" name="checkbox" class="input-field">
+		<input type="checkbox" id="checkbox" name="checkbox" class="input-field" >
 
 		<input type="submit" value="Submit" class="submit-button">
 	</form>
@@ -66,7 +66,7 @@ require_once 'navbar.php';
 	?>
 </div>
 
-<script src="validateInput.js"></script>
+<script defer src="validateInput.js"></script>
 
 <?php
 require_once 'footer.php';
