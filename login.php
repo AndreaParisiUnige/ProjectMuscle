@@ -66,6 +66,8 @@ require_once 'navbar.php';
 	?>
 </div>
 
+<script src="validateInput.js"></script>
+
 <?php
 require_once 'footer.php';
 ?>

@@ -48,19 +48,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 	<form action="registration.php" method="post">
 
 		<label for="firstname" class="label">First name:</label>
-		<input type="text" id="firstname" name="firstname" class="input-field" required>
+		<input type="text" id="firstname" name="firstname" class="input-field">
 
 		<label for="lastname" class="label">Last name:</label>
-		<input type="text" id="lastname" name="lastname" class="input-field" required>
+		<input type="text" id="lastname" name="lastname" class="input-field">
 
 		<label for="email" class="label">Email:</label>
-		<input type="email" id="email" name="email" class="input-field" required>
+		<input type="email" id="email" name="email" class="input-field">
 
 		<label for="pass" class="label">Password:</label>
-		<input type="password" id="pass" name="pass" class="input-field" required>
+		<input type="password" id="pass" name="pass" class="input-field">
 
 		<label for="confirm" class="label">Confirm password:</label>
-		<input type="password" id="confirm" name="confirm" class="input-field" required>
+		<input type="password" id="confirm" name="confirm" class="input-field">
 
 		<input type="submit" value="Submit" class="submit-button">
 	</form>
@@ -69,6 +69,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 	checkSessionError();
 	?>
 </div>
+
+<script src="validateInput.js"></script>
 
 <?php
 require_once 'footer.php';
