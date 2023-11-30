@@ -45,19 +45,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 require_once 'navbar.php';
 ?>
 
-<div class="form-container">
-	<h1>Inserisci i tuoi dati</h1>
-	<form action="login.php" method="post">
-		<label for="email" class="label">Email:</label>
-		<input type="email" id="email" name="email" class="input-field" placeholder="Enter your email">
-
-		<label for="pass" class="label">Password:</label>
-		<input type="password" id="pass" name="pass" class="input-field" placeholder="Enter your password">
-
-		<label for="checkbox" class="label">Remember Me:</label>
-		<input type="checkbox" id="checkbox" name="checkbox" class="input-field" >
-
-		<input type="submit" value="Submit" class="submit-button">
+<div>
+	<form id="form" action="login.php" method="post">
+		<h3>Login</h3>
+		<div class="input-control">
+			<label for="email">Email:</label>
+			<input type="email" id="email" name="email" placeholder="Enter your email">
+		</div>
+		<div class="input-control">
+			<label for="pass">Password:</label>
+			<input type="password" id="pass" name="pass" placeholder="Enter your password">
+		</div>
+		<label class="checkbox" for="checkbox">
+			<input type="checkbox" id="checkbox" name="checkbox">
+			<span>Remember Me</span>
+		</label>
+		<button class="responsive secondary small small-elevate" type="submit">Sign Up</button>
 	</form>
 
 	<?php

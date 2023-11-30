@@ -42,6 +42,18 @@ function get_pwd_fromUser($email, $con){
     return null;
 }
 
+function get_User($email, $con){
+    check_mysqliPrepareReturn($get_pwd = mysqli_prepare($con, "SELECT email FROM users WHERE email=?"), $con);
+    check_mysqliBindReturn(mysqli_stmt_bind_param($get_pwd, "s", $email), $con);
+    check_mysqliExecuteReturn(mysqli_stmt_execute($get_pwd), $con);
+    $result = mysqli_stmt_get_result($get_pwd);
+    if($result && mysqli_num_rows($result) > 0){
+        $row = mysqli_fetch_array($result);
+        return $row["email"];
+    }
+    return null;
+}
+
 function delete_user($id, $con){
     check_mysqliPrepareReturn($delete_stmt = mysqli_prepare($con, "DELETE FROM users WHERE id=?"), $con);
     check_mysqliBindReturn(mysqli_stmt_bind_param($delete_stmt, "i", $id), $con);
@@ -81,6 +93,7 @@ function remove_RememberMe($con){
         $_SESSION['error_message'] = "<span>Si è verificato un errore, riprovare più tardi</span>";
         error_log("Failed to remove cookie from the database: ". mysqli_error($con) ."\n", 3, "error.log");
         mysqli_stmt_close($remove_cookie_stmt);
+        return;
     }      
     mysqli_stmt_close($remove_cookie_stmt);
 }

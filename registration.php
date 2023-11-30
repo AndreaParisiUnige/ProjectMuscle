@@ -39,26 +39,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 
-<div class="form-container">
-	<h1>Inserisci i tuoi dati</h1>
-	<form action="registration.php" method="post">
+<div>
+	<form id=form action="registration.php" method="post" novalidate>
+	<h3>Registrazione</h3>
+		<div class="input-control">
+			<label for="firstname">Nome:</label>
+			<input type="text" id="firstname" name="firstname" placeholder="Enter your name">
+		</div>
 
-		<label for="firstname" class="label">First name:</label>
-		<input type="text" id="firstname" name="firstname" class="input-field" placeholder="Enter your name">
+		<div class="input-control">
+			<label for="lastname" class="label">Cognome:</label>
+			<input type="text" id="lastname" name="lastname" placeholder="Enter your surname">
+		</div>
 
-		<label for="lastname" class="label">Last name:</label>
-		<input type="text" id="lastname" name="lastname" class="input-field" placeholder="Enter your surname">
+		<div class="input-control">
+			<label for="email" class="label">Email:</label>
+			<input type="email" id="email" name="email" placeholder="Enter your email" >
+		</div>
 
-		<label for="email" class="label">Email:</label>
-		<input type="email" id="email" name="email" class="input-field" placeholder="Enter your email">
+		<div class="input-control">
+			<label for="pass" class="label">Password:</label>
+			<input type="password" id="pass" name="pass" placeholder="Enter your password">
+		</div>
 
-		<label for="pass" class="label">Password:</label>
-		<input type="password" id="pass" name="pass" class="input-field" placeholder="Enter your password">
-
-		<label for="confirm" class="label">Confirm password:</label>
-		<input type="password" id="confirm" name="confirm" class="input-field" placeholder="Confirm your password">
-
-		<input type="submit" value="Submit" class="submit-button">
+		<div class="input-control">
+			<label for="confirm" class="label">Conferma password:</label>
+			<input type="password" id="confirm" name="confirm" placeholder="Confirm your password">
+		</div>
+		<button  class="responsive secondary small small-elevate" type="submit">Sign in</button>
 	</form>
 
 	<?php
