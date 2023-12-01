@@ -83,20 +83,25 @@ function checkEmptyField(e, fieldNode) {
         toggleError(fieldNode, emptyFieldError, false, true);
 }
 
+function checkEmptyFields(e, ...params) {
+    params.forEach(element => {
+        var fieldNode = document.getElementById(element);
+        checkEmptyField(e, fieldNode);
+    });
+}
+
 function checkMatchingPass(e, fieldNode) {
     let { emptyFieldError, passNotMatchError, emailNotValidError, existingEmailError } = checkErrorNodes(fieldNode.id);
     if (!conditionalAddError(e, "fieldNode.value.trim() != pass", fieldNode, passNotMatchError, true, ErrorMessages.PASSWORD_MISMATCH, 'NotMatch')){ // Password non corrispondenti
-        if (passNotMatchError && emptyFieldError)
-            toggleError(fieldNode, passNotMatchError, false, false);
-        else if (passNotMatchError)
-            toggleError(fieldNode, passNotMatchError, false, true);
+        if (passNotMatchError)
+            toggleError(fieldNode, passNotMatchError, false, emptyFieldError ? false : true);
     } 
 }
 
 function checkValidEmail(e, fieldNode) {
     let { emptyFieldError, passNotMatchError, emailNotValidError, existingEmailError } = checkErrorNodes(fieldNode.id);
     if(!conditionalAddError(e, "!isValidEmail(fieldNode.value.trim())", fieldNode, emailNotValidError, true, ErrorMessages.INVALID_EMAIL, 'NotValid')){
-        if (existingEmailError && emptyFieldError)
+        if (existingEmailError || emptyFieldError)
             toggleError(fieldNode, emailNotValidError, false, false);  
         else if (emailNotValidError)
             toggleError(fieldNode, emailNotValidError, false, true);    
@@ -116,7 +121,9 @@ function validateInputs(e, ...params) {
 }
 
 function checkExistingEmail(){
-    let emailError = document.getElementById('emailAlreadyExist-error');
+    let { emptyFieldError, passNotMatchError, emailNotValidError, existingEmailError } = checkErrorNodes('email');
+    hasError = emptyFieldError ||  emailNotValidError;
+
     let emailNode = document.getElementById('email');
     let emailVal = emailNode.value.trim();
         if (isValidEmail(emailVal)) {
@@ -133,19 +140,19 @@ function checkExistingEmail(){
             })
             .then(data => {
                 if (data.existing_User) {
-                    if (!emailError)
+                    if (!existingEmailError)
                         errorNodeEmail = createErrorNode('email', ErrorMessages.ALREADY_EXISTS, 'AlreadyExist');
                         toggleError(emailNode, errorNodeEmail, true, true); 
                 }
-                else
-                    toggleError(emailNode, emailError, false, true);
+                else if (!hasError)
+                    toggleError(emailNode, existingEmailError, false, true);
             })
             .catch(error => {
                 console.log(error);
             });
         }
-        else if (emailError || !isValidEmail(emailVal)) 
-            toggleError(emailNode, emailError, false, null);
+        else if (existingEmailError)
+            toggleError(emailNode, existingEmailError, false, !hasError? null : false);
 }
 
 
@@ -153,15 +160,16 @@ const path = window.location.pathname;
 const pageName = path.split('/').pop();
 
 document.querySelector('form').addEventListener('submit', function (e) {
-    if (pageName === 'registration.php') 
-        validateInputs(e, 'firstname', 'lastname', 'email', 'pass', 'confirm');         
+    checkEmptyFields(e, 'firstname', 'lastname', 'email', 'pass', 'confirm');
+});
+
+document.querySelector('form').addEventListener('input', function (e) {
+    if (pageName === 'registration.php') {
+        validateInputs(e, 'firstname', 'lastname', 'email', 'pass', 'confirm');    
+        if (e.target && e.target.matches('input[type="email"]')) {
+            checkExistingEmail();
+        } 
+    }
     else if (pageName === 'login.php')
         validateInputs(e, 'email', 'pass');
 });
-
-document.querySelector('input[type="email"]').addEventListener('input', function () {
-    checkExistingEmail();            
-});
-
-
-
