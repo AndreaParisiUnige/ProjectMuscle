@@ -108,67 +108,74 @@ function checkValidEmail(e, fieldNode) {
     }   
 }
 
+async function checkExistingEmail(){
+    let { emptyFieldError, passNotMatchError, emailNotValidError, existingEmailError } = checkErrorNodes('email');
+    hasError = emptyFieldError ||  emailNotValidError;
+
+    let emailNode = document.getElementById('email');
+    let emailVal = emailNode.value.trim();
+    if (isValidEmail(emailVal)) {
+        return fetch('checkExistingEmail.php', {
+            method: 'POST',
+            headers: { "Content-type": "application/x-www-form-urlencoded" },
+            body: `email=${emailVal}`
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Errore nella richiesta');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.existing_User) {
+                if (!existingEmailError) {
+                    errorNodeEmail = createErrorNode('email', ErrorMessages.ALREADY_EXISTS, 'AlreadyExist');
+                    toggleError(emailNode, errorNodeEmail, true, true);                    
+                }              
+                return true;
+            }
+            else if (!hasError)
+                toggleError(emailNode, existingEmailError, false, true);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    }
+    else if (existingEmailError)
+        toggleError(emailNode, existingEmailError, false, !hasError? null : false);
+}
+
 function validateInputs(e, ...params) {
     params.forEach(element => {
         var fieldNode = document.getElementById(element);
         if(!checkEmptyField(e, fieldNode)){
-            if (element === 'email')
+            if (element === 'email') {
                 checkValidEmail(e, fieldNode);
+            }
             if (element === 'confirm')
                 checkMatchingPass(e, fieldNode);
         }
     });
 }
 
-function checkExistingEmail(){
-    let { emptyFieldError, passNotMatchError, emailNotValidError, existingEmailError } = checkErrorNodes('email');
-    hasError = emptyFieldError ||  emailNotValidError;
-
-    let emailNode = document.getElementById('email');
-    let emailVal = emailNode.value.trim();
-        if (isValidEmail(emailVal)) {
-            fetch('checkExistingEmail.php', {
-                method: 'POST',
-                headers: { "Content-type": "application/x-www-form-urlencoded" },
-                body: `email=${emailVal}`
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Errore nella richiesta');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.existing_User) {
-                    if (!existingEmailError)
-                        errorNodeEmail = createErrorNode('email', ErrorMessages.ALREADY_EXISTS, 'AlreadyExist');
-                        toggleError(emailNode, errorNodeEmail, true, true); 
-                }
-                else if (!hasError)
-                    toggleError(emailNode, existingEmailError, false, true);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-        }
-        else if (existingEmailError)
-            toggleError(emailNode, existingEmailError, false, !hasError? null : false);
-}
-
 
 const path = window.location.pathname;
 const pageName = path.split('/').pop();
+let exist = false;
 
-document.querySelector('form').addEventListener('submit', function (e) {
-    checkEmptyFields(e, 'firstname', 'lastname', 'email', 'pass', 'confirm');
-});
-
-document.querySelector('form').addEventListener('input', function (e) {
+document.querySelector('form').addEventListener('input', async function (e) {
     if (pageName === 'registration.php') {
         validateInputs(e, 'firstname', 'lastname', 'email', 'pass', 'confirm');    
-        if (e.target && e.target.matches('input[type="email"]')) {
-            checkExistingEmail();
-        } 
+        if (e.target && e.target.matches('input[type="email"]')) 
+            exist = await checkExistingEmail();
+    }
+});
+
+document.querySelector('form').addEventListener('submit', function (e) {
+    if (pageName === 'registration.php') {
+        if (exist)
+            e.preventDefault();
+        validateInputs(e, 'firstname', 'lastname', 'email', 'pass', 'confirm'); 
     }
     else if (pageName === 'login.php')
         validateInputs(e, 'email', 'pass');
