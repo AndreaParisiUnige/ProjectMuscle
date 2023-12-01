@@ -5,108 +5,120 @@ const ErrorMessages = {
     ALREADY_EXISTS: 'Email già registrata'
 };
 
+const BorderColor = {
+    ERROR : '2px solid #a50727',
+    SUCCESS : '2px solid green',
+    NONE : 'none'
+}
+
+function setBorderColor(node, color) {
+    node.style.border = color;
+}
+
 function isValidEmail(email) {
     const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
 }
 
+// Crea e ritorna un div contenente il messaggio di errore, con classe errorDiv e id elementoId-error
 function createErrorNode(element, message, errorId) {
-    var errorNode = document.createElement('div');
+    let errorNode = document.createElement('div');
     errorNode.innerText = message;
     errorNode.setAttribute('class', 'errorDiv');
     errorNode.setAttribute('id', `${element}${errorId}-error`);
     return errorNode;
 }
 
+// Ritorna un oggetto contenente i nodi degli errori se presenti
+function checkErrorNodes(element) {
+    return {
+        emptyFieldError: document.getElementById(`${element}-error`),
+        passNotMatchError: element === 'confirm' ? document.getElementById('confirmNotMatch-error') : null,
+        emailNotValidError: element === 'email' ? document.getElementById('emailNotValid-error') : null,
+        existingEmailError: element === 'email' ? document.getElementById('emailAlreadyExist-error') : null
+    };
+}
 
-function toggleError(fieldNode, errorNode, addError, existingError) {
+// Gestisce gli errori:
+// addError=true: aggiunge l'errore --> se setErrorBorder=true imposta bordo rosso
+// addError=false: rimuove l'errore --> se setErrorBorder=null elimina bordo, se setErrorBorder=true imposta bordo verde, 
+function toggleError(fieldNode, errorNode, addError, setBorder) {
     if (addError) {
-        fieldNode.style.border = '2px solid #a50727';
+        if (setBorder)
+            setBorderColor(fieldNode, BorderColor.ERROR);
         fieldNode.insertAdjacentElement('afterend', errorNode);
     } else {
-        if (!existingError)
-            fieldNode.style.border = '2px solid green';
+        if(setBorder === null)
+            setBorderColor(fieldNode, BorderColor.NONE);
+        else if (setBorder)
+            setBorderColor(fieldNode, BorderColor.SUCCESS);
         if (errorNode)
             errorNode.remove();
     }
 }
 
+function conditionalAddError(e, condition, fieldNode, existingErrorNode, setErrorBorder, errorMessage, errorId) {
+    if (fieldNode.id === 'confirm') {
+        var pass = document.getElementById('pass').value.trim();
+    }
+    if (eval(condition)) { 
+        e.preventDefault();
+        if (!existingErrorNode) {
+            let newErrorNode = createErrorNode(fieldNode.id, errorMessage, errorId);
+            toggleError(fieldNode, newErrorNode, true, setErrorBorder);                  
+        }
+        return true;
+    }
+}
+
+function checkEmptyField(e, fieldNode) {
+    let { emptyFieldError, passNotMatchError, emailNotValidError, existingEmailError } = checkErrorNodes(fieldNode.id);
+    let hasError = passNotMatchError || emailNotValidError || existingEmailError;
+
+    if (conditionalAddError(e, "fieldNode.value.trim() === ''", fieldNode, emptyFieldError, true, ErrorMessages.EMPTY_FIELD, ''))   // Campo vuoto, aggiungo errore e bordo rosso
+        return true; 
+    else if (hasError)                                                                     // Se sono presenti errori sul nodo mi limito a togliere il messaggio EMPTY_FIELD
+        toggleError(fieldNode, emptyFieldError, false, false);   
+    else 
+        toggleError(fieldNode, emptyFieldError, false, true);
+}
+
+function checkMatchingPass(e, fieldNode) {
+    let { emptyFieldError, passNotMatchError, emailNotValidError, existingEmailError } = checkErrorNodes(fieldNode.id);
+    if (!conditionalAddError(e, "fieldNode.value.trim() != pass", fieldNode, passNotMatchError, true, ErrorMessages.PASSWORD_MISMATCH, 'NotMatch')){ // Password non corrispondenti
+        if (passNotMatchError && emptyFieldError)
+            toggleError(fieldNode, passNotMatchError, false, false);
+        else if (passNotMatchError)
+            toggleError(fieldNode, passNotMatchError, false, true);
+    } 
+}
+
+function checkValidEmail(e, fieldNode) {
+    let { emptyFieldError, passNotMatchError, emailNotValidError, existingEmailError } = checkErrorNodes(fieldNode.id);
+    if(!conditionalAddError(e, "!isValidEmail(fieldNode.value.trim())", fieldNode, emailNotValidError, true, ErrorMessages.INVALID_EMAIL, 'NotValid')){
+        if (existingEmailError && emptyFieldError)
+            toggleError(fieldNode, emailNotValidError, false, false);  
+        else if (emailNotValidError)
+            toggleError(fieldNode, emailNotValidError, false, true);    
+    }   
+}
 
 function validateInputs(e, ...params) {
-    var passMatchErrorNode = document.getElementById('confirmNotMatch-error');
-    var emailNotValid = document.getElementById(`emailNotValid-error`);
-
     params.forEach(element => {
         var fieldNode = document.getElementById(element);
-        var fieldValue = fieldNode.value.trim();
-
-        var emptyFieldErrorNode = document.getElementById(`${element}-error`);
-
-        if (fieldValue === '') {
-            e.preventDefault();
-            if (!emptyFieldErrorNode) {
-                var errorNodeEmpty = createErrorNode(element, ErrorMessages.EMPTY_FIELD, '');
-                toggleError(fieldNode, errorNodeEmpty, true, null);                     // Campo vuoto, aggiungo errore e bordo rosso
-            }
-        }
-        else if (emptyFieldErrorNode && passMatchErrorNode && element === 'confirm')   // Errore di password mismatch e di campo vuoto da submit precedente
-            toggleError(fieldNode, emptyFieldErrorNode, false, true);                   // Non imposto il bordo verde essendo presente l'errore di password mismatch
-        else if (emptyFieldErrorNode && !emailNotValid)                                                   // Bordo verde: pass mismatch non presente e campo pieno
-            toggleError(fieldNode, emptyFieldErrorNode, false, false);
-        else if ((fieldValue !== '' && element !== 'confirm' && element !== 'email') || (!passMatchErrorNode && element === 'confirm'))  // Campo pieno e non è confirm, oppure è confirm e non c'è errore di password mismatch
-            fieldNode.style.border = '2px solid green';
-
-        if (element === 'confirm') {
-            emptyFieldErrorNode = document.getElementById(`${element}-error`);
-            var pass = document.getElementById('pass').value.trim();
-            if (pass != fieldValue) {
-                e.preventDefault();
-                if (!passMatchErrorNode) {
-                    var errorNodePass = createErrorNode('confirm', ErrorMessages.PASSWORD_MISMATCH, 'NotMatch');
-                    toggleError(fieldNode, errorNodePass, true, null);
-                }
-            }
-            else if (passMatchErrorNode && emptyFieldErrorNode)
-                toggleError(fieldNode, passMatchErrorNode, false, true);
-            else if (passMatchErrorNode && !emptyFieldErrorNode)
-                toggleError(fieldNode, passMatchErrorNode, false, false);
-        }
-
-        if (element == 'email') {
-            var emailNotValid = document.getElementById(`emailNotValid-error`);
-            emptyFieldErrorNode = document.getElementById(`${element}-error`);
-
-            if (!emptyFieldErrorNode) {
-                if (!isValidEmail(fieldValue)) {
-                    e.preventDefault();
-                    if (!emailNotValid) {
-                        var errorNodeEmail = createErrorNode('email', ErrorMessages.INVALID_EMAIL, 'NotValid');
-                        toggleError(fieldNode, errorNodeEmail, true, null);
-                    }
-                }
-                else
-                    toggleError(fieldNode, emailNotValid, false, false);
-            }
+        if(!checkEmptyField(e, fieldNode)){
+            if (element === 'email')
+                checkValidEmail(e, fieldNode);
+            if (element === 'confirm')
+                checkMatchingPass(e, fieldNode);
         }
     });
 }
 
-
-const path = window.location.pathname;
-const pageName = path.split('/').pop();
-
-document.querySelector('form').addEventListener('submit', function (e) {
-    if (pageName === 'registration.php')
-        validateInputs(e, 'firstname', 'lastname', 'email', 'pass', 'confirm');
-    else if (pageName === 'login.php')
-        validateInputs(e, 'email', 'pass');
-});
-
-if (pageName === 'registration.php') {
-    document.querySelector('input[type="email"]').addEventListener('input', function (e) {
-        var emailError = document.getElementById('emailAlreadyExist-error');
-        var emailNode = document.getElementById('email');
-        var emailVal = emailNode.value.trim();
+function checkExistingEmail(){
+    let emailError = document.getElementById('emailAlreadyExist-error');
+    let emailNode = document.getElementById('email');
+    let emailVal = emailNode.value.trim();
         if (isValidEmail(emailVal)) {
             fetch('checkExistingEmail.php', {
                 method: 'POST',
@@ -123,19 +135,33 @@ if (pageName === 'registration.php') {
                 if (data.existing_User) {
                     if (!emailError)
                         errorNodeEmail = createErrorNode('email', ErrorMessages.ALREADY_EXISTS, 'AlreadyExist');
-                        toggleError(emailNode, errorNodeEmail, true, null); 
+                        toggleError(emailNode, errorNodeEmail, true, true); 
                 }
                 else
-                    toggleError(emailNode, emailError, false, false);
+                    toggleError(emailNode, emailError, false, true);
             })
             .catch(error => {
                 console.log(error);
             });
         }
-        else if (emailError || !isValidEmail(emailVal)) {
-            toggleError(emailNode, emailError, false, false);
-            emailNode.style.border = 'none';
-        }
-        
-    });
+        else if (emailError || !isValidEmail(emailVal)) 
+            toggleError(emailNode, emailError, false, null);
 }
+
+
+const path = window.location.pathname;
+const pageName = path.split('/').pop();
+
+document.querySelector('form').addEventListener('submit', function (e) {
+    if (pageName === 'registration.php') 
+        validateInputs(e, 'firstname', 'lastname', 'email', 'pass', 'confirm');         
+    else if (pageName === 'login.php')
+        validateInputs(e, 'email', 'pass');
+});
+
+document.querySelector('input[type="email"]').addEventListener('input', function () {
+    checkExistingEmail();            
+});
+
+
+
