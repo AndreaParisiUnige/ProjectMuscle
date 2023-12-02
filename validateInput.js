@@ -83,12 +83,6 @@ function checkEmptyField(e, fieldNode) {
         toggleError(fieldNode, emptyFieldError, false, true);
 }
 
-function checkEmptyFields(e, ...params) {
-    params.forEach(element => {
-        var fieldNode = document.getElementById(element);
-        checkEmptyField(e, fieldNode);
-    });
-}
 
 function checkMatchingPass(e, fieldNode) {
     let { emptyFieldError, passNotMatchError, emailNotValidError, existingEmailError } = checkErrorNodes(fieldNode.id);
