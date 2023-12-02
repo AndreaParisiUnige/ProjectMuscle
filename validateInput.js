@@ -83,7 +83,6 @@ function checkEmptyField(e, fieldNode) {
         toggleError(fieldNode, emptyFieldError, false, true);
 }
 
-
 function checkMatchingPass(e, fieldNode) {
     let { emptyFieldError, passNotMatchError, emailNotValidError, existingEmailError } = checkErrorNodes(fieldNode.id);
     if (!conditionalAddError(e, "fieldNode.value.trim() != pass", fieldNode, passNotMatchError, true, ErrorMessages.PASSWORD_MISMATCH, 'NotMatch')){ // Password non corrispondenti
