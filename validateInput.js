@@ -6,9 +6,9 @@ const ErrorMessages = {
 };
 
 const BorderColor = {
-    ERROR : '2px solid #a50727',
-    SUCCESS : '2px solid green',
-    NONE : 'none'
+    ERROR: '2px solid #a50727',
+    SUCCESS: '2px solid green',
+    NONE: 'none'
 }
 
 function setBorderColor(node, color) {
@@ -39,6 +39,14 @@ function checkErrorNodes(element) {
     };
 }
 
+// Ritorna true se almeno uno dei nodi degli errori è presente
+function checkGlobalErrorNodes(...elements) {
+    return elements.some(element => {
+        let { emptyFieldError, passNotMatchError, emailNotValidError, existingEmailError } = checkErrorNodes(element);
+        return (emptyFieldError || passNotMatchError || emailNotValidError || existingEmailError);
+    });
+}
+
 // Gestisce gli errori:
 // addError=true: aggiunge l'errore --> se setErrorBorder=true imposta bordo rosso
 // addError=false: rimuove l'errore --> se setErrorBorder=null elimina bordo, se setErrorBorder=true imposta bordo verde, 
@@ -48,7 +56,7 @@ function toggleError(fieldNode, errorNode, addError, setBorder) {
             setBorderColor(fieldNode, BorderColor.ERROR);
         fieldNode.insertAdjacentElement('afterend', errorNode);
     } else {
-        if(setBorder === null)
+        if (setBorder === null)
             setBorderColor(fieldNode, BorderColor.NONE);
         else if (setBorder)
             setBorderColor(fieldNode, BorderColor.SUCCESS);
@@ -61,11 +69,11 @@ function conditionalAddError(e, condition, fieldNode, existingErrorNode, setErro
     if (fieldNode.id === 'confirm') {
         var pass = document.getElementById('pass').value.trim();
     }
-    if (eval(condition)) { 
+    if (eval(condition)) {
         e.preventDefault();
         if (!existingErrorNode) {
             let newErrorNode = createErrorNode(fieldNode.id, errorMessage, errorId);
-            toggleError(fieldNode, newErrorNode, true, setErrorBorder);                  
+            toggleError(fieldNode, newErrorNode, true, setErrorBorder);
         }
         return true;
     }
@@ -76,34 +84,42 @@ function checkEmptyField(e, fieldNode) {
     let hasError = passNotMatchError || emailNotValidError || existingEmailError;
 
     if (conditionalAddError(e, "fieldNode.value.trim() === ''", fieldNode, emptyFieldError, true, ErrorMessages.EMPTY_FIELD, ''))   // Campo vuoto, aggiungo errore e bordo rosso
-        return true; 
+        return true;
     else if (hasError)                                                                     // Se sono presenti errori sul nodo mi limito a togliere il messaggio EMPTY_FIELD
-        toggleError(fieldNode, emptyFieldError, false, false);   
-    else 
+        toggleError(fieldNode, emptyFieldError, false, false);
+    else
         toggleError(fieldNode, emptyFieldError, false, true);
+}
+
+function checkEmptyFields(e, ...params) {
+    params.forEach(element => {
+        var fieldNode = document.getElementById(element);
+        if (checkEmptyField(e, fieldNode))
+            return true;
+    });
 }
 
 function checkMatchingPass(e, fieldNode) {
     let { emptyFieldError, passNotMatchError, emailNotValidError, existingEmailError } = checkErrorNodes(fieldNode.id);
-    if (!conditionalAddError(e, "fieldNode.value.trim() != pass", fieldNode, passNotMatchError, true, ErrorMessages.PASSWORD_MISMATCH, 'NotMatch')){ // Password non corrispondenti
+    if (!conditionalAddError(e, "fieldNode.value.trim() != pass", fieldNode, passNotMatchError, true, ErrorMessages.PASSWORD_MISMATCH, 'NotMatch')) { // Password non corrispondenti
         if (passNotMatchError)
             toggleError(fieldNode, passNotMatchError, false, emptyFieldError ? false : true);
-    } 
+    }
 }
 
 function checkValidEmail(e, fieldNode) {
     let { emptyFieldError, passNotMatchError, emailNotValidError, existingEmailError } = checkErrorNodes(fieldNode.id);
-    if(!conditionalAddError(e, "!isValidEmail(fieldNode.value.trim())", fieldNode, emailNotValidError, true, ErrorMessages.INVALID_EMAIL, 'NotValid')){
+    if (!conditionalAddError(e, "!isValidEmail(fieldNode.value.trim())", fieldNode, emailNotValidError, true, ErrorMessages.INVALID_EMAIL, 'NotValid')) {
         if (existingEmailError || emptyFieldError)
-            toggleError(fieldNode, emailNotValidError, false, false);  
+            toggleError(fieldNode, emailNotValidError, false, false);
         else if (emailNotValidError)
-            toggleError(fieldNode, emailNotValidError, false, true);    
-    }   
+            toggleError(fieldNode, emailNotValidError, false, true);
+    }
 }
 
-async function checkExistingEmail(){
+async function checkExistingEmail() {
     let { emptyFieldError, passNotMatchError, emailNotValidError, existingEmailError } = checkErrorNodes('email');
-    hasError = emptyFieldError ||  emailNotValidError;
+    hasError = emptyFieldError || emailNotValidError;
 
     let emailNode = document.getElementById('email');
     let emailVal = emailNode.value.trim();
@@ -113,35 +129,35 @@ async function checkExistingEmail(){
             headers: { "Content-type": "application/x-www-form-urlencoded" },
             body: `email=${emailVal}`
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Errore nella richiesta');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.existing_User) {
-                if (!existingEmailError) {
-                    errorNodeEmail = createErrorNode('email', ErrorMessages.ALREADY_EXISTS, 'AlreadyExist');
-                    toggleError(emailNode, errorNodeEmail, true, true);                    
-                }              
-                return true;
-            }
-            else if (!hasError)
-                toggleError(emailNode, existingEmailError, false, true);
-        })
-        .catch(error => {
-            console.log(error);
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Errore nella richiesta');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.existing_User) {
+                    if (!existingEmailError) {
+                        errorNodeEmail = createErrorNode('email', ErrorMessages.ALREADY_EXISTS, 'AlreadyExist');
+                        toggleError(emailNode, errorNodeEmail, true, true);
+                    }
+                    return true;
+                }
+                else if (!hasError)
+                    toggleError(emailNode, existingEmailError, false, true);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
     else if (existingEmailError)
-        toggleError(emailNode, existingEmailError, false, !hasError? null : false);
+        toggleError(emailNode, existingEmailError, false, !hasError ? null : false);
 }
 
 function validateInputs(e, ...params) {
     params.forEach(element => {
         var fieldNode = document.getElementById(element);
-        if(!checkEmptyField(e, fieldNode)){
+        if (!checkEmptyField(e, fieldNode)) {
             if (element === 'email') {
                 checkValidEmail(e, fieldNode);
             }
@@ -158,17 +174,17 @@ let exist = false;
 
 document.querySelector('form').addEventListener('input', async function (e) {
     if (pageName === 'registration.php') {
-        validateInputs(e, 'firstname', 'lastname', 'email', 'pass', 'confirm');    
-        if (e.target && e.target.matches('input[type="email"]')) 
+        validateInputs(e, 'firstname', 'lastname', 'email', 'pass', 'confirm');
+        if (e.target && e.target.matches('input[type="email"]'))
             exist = await checkExistingEmail();
     }
 });
 
 document.querySelector('form').addEventListener('submit', function (e) {
     if (pageName === 'registration.php') {
-        if (exist)
+        if (exist || checkGlobalErrorNodes('firstname', 'lastname', 'email', 'pass', 'confirm')
+            || checkEmptyFields(e, 'firstname', 'lastname', 'email', 'pass', 'confirm'))
             e.preventDefault();
-        validateInputs(e, 'firstname', 'lastname', 'email', 'pass', 'confirm'); 
     }
     else if (pageName === 'login.php')
         validateInputs(e, 'email', 'pass');
