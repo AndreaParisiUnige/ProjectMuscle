@@ -22,14 +22,14 @@ function checkNotEmptyParams(...$params){
 
 function validateEmail($email){
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $_SESSION["error_message"] = "<span>L'indirizzo email non è valido</span>";
+        $_SESSION["error_message"] = "L'indirizzo email non è valido";
         redirectBack();
     }
 }
 
 function validatePassword($pass, $confirm){
     if($pass != $confirm){
-        $_SESSION["error_message"] = "<span>Le password non coincidono</span>";
+        $_SESSION["error_message"] = "Le password non coincidono";
         redirectBack();
     }
 }
@@ -39,6 +39,18 @@ function check_mysqliPrepareReturn($return, $con){
     if(!$return){
         $_SESSION["error_message"] = "Errore: qualcosa è andato storto, si prega di riprovare più tardi\n";
         error_log("Failed to prepare the query: ". mysqli_error($con) . "\n", 3, "error.log");
+        redirectBack();
+    }
+}
+function check_mysqliFunction($return, $con, $fun, $query){
+    if(!$return){
+        $_SESSION["error_message"] = "Errore: qualcosa è andato storto, si prega di riprovare più tardi\n";
+        $errorMessage = "Failed to complete the function '" . $fun ."'";
+        if (!empty($query)) {
+            $errorMessage .= " (Query: " . $query . ")";
+        }
+        $errorMessage .= ": " . mysqli_error($con) . "\n";
+        error_log($errorMessage, 3, "error.log");
         redirectBack();
     }
 }
@@ -78,15 +90,37 @@ function errorHandler($errstr, $errfile, $errline) {
 // dalla precedente pagina di login
 function checkSessionError(){
     if (isset($_SESSION['error_message'])) {
-        echo "<span>" . $_SESSION['error_message'] . "</span>";
+        echo "<div class='center-align'>" . $_SESSION['error_message'] . "</div>";
         unset($_SESSION['error_message']); 
     }
 }
 function checkSessionMessage(){
     if (isset($_SESSION['message'])) {
-        echo "<span>" . $_SESSION['message'] . "</span>";
+        echo "<div class='center-align'>" . $_SESSION['message'] . "</div>";
         unset($_SESSION['message']); 
     }
+}
+
+function getTypes($valori){
+    $tipi = '';
+    foreach ($valori as $valore) {
+        if (is_int($valore)) {
+            $tipi .= 'i'; // Interi
+        } elseif (is_float($valore)) {
+            $tipi .= 'd'; // Double/float
+        } elseif (is_bool($valore)) {
+            $tipi .= 'i'; // Booleani possono essere trattati come interi
+        } else {
+            $tipi .= 's'; // Default a stringa per altri tipi
+        }
+    }
+    return $tipi;
+}
+
+function setSessionParams($row){
+    $_SESSION["logged_in"] = true;
+    $_SESSION["email"] = $row["email"];
+    $_SESSION["admin"] = $row["admin"];  
 }
 
 ?>

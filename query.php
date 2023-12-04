@@ -8,6 +8,34 @@
 require_once 'utils.php';
 set_error_handler("errorHandler");
 
+define('SELECT_PARAMS', ['email', 'admin', 'rememberMeToken', 'cookie_expiration']);
+define('WHERE_STMT', 'rememberMeToken=? AND cookie_expiration > NOW()');
+
+
+// Richiede la tabella su cui fare la query, divide un array in stringhe separate da virgola e le concatena
+// per comporre la select. Richiede una stringa per comporre il where e un array con i tipi di dato da inserire
+// Il primo array può essere un regolare array, il secondo deve essere un array associativo
+
+function genericSelect($table, $select_Columns, $where, $toBind, $con){
+    $query = "SELECT " . implode(", ", $select_Columns) . " FROM " . $table . " WHERE " . $where;
+    check_mysqliFunction($stmt = mysqli_prepare($con, $query), $con, 'prepare', $query);
+
+    if (!empty($toBind)) {
+        $values = array_values($toBind);    // Ottengo i nomi associati ai valori sotto forma di array
+        $types = getTypes($values);         // Ottengo i tipi di dato associati ai valori sotto forma di stringa
+        check_mysqliFunction(mysqli_stmt_bind_param($stmt, $types, ...$values), $con, 'bind', $query);
+    }
+
+    check_mysqliFunction(mysqli_stmt_execute($stmt), $con, 'bind', $query);
+    check_mysqliFunction($result = mysqli_stmt_get_result($stmt), $con, 'get result', $query);
+    mysqli_stmt_close($stmt);
+    if($result && mysqli_num_rows($result) > 0){
+        $row = mysqli_fetch_array($result);      
+        return $row;
+    }
+    return null;
+}
+
 //CHECKED
 function insert_user_data($name, $lastname, $email, $hash, $con){
 
@@ -29,41 +57,16 @@ function insert_user_data($name, $lastname, $email, $hash, $con){
     }
 }
 
-//CHECKED
-function get_pwd_fromUser($email, $con){
-    check_mysqliPrepareReturn($get_pwd = mysqli_prepare($con, "SELECT password, admin FROM users WHERE email=?"), $con);
-    check_mysqliBindReturn(mysqli_stmt_bind_param($get_pwd, "s", $email), $con);
-    check_mysqliExecuteReturn(mysqli_stmt_execute($get_pwd), $con);
-    $result = mysqli_stmt_get_result($get_pwd);
-    if($result && mysqli_num_rows($result) > 0){
-        $row = mysqli_fetch_array($result);
-        return array ($row["password"], $row["admin"]);
-    }
-    return null;
-}
-
-function get_User($email, $con){
-    check_mysqliPrepareReturn($get_pwd = mysqli_prepare($con, "SELECT email FROM users WHERE email=?"), $con);
-    check_mysqliBindReturn(mysqli_stmt_bind_param($get_pwd, "s", $email), $con);
-    check_mysqliExecuteReturn(mysqli_stmt_execute($get_pwd), $con);
-    $result = mysqli_stmt_get_result($get_pwd);
-    if($result && mysqli_num_rows($result) > 0){
-        $row = mysqli_fetch_array($result);
-        return $row["email"];
-    }
-    return null;
-}
-
 function delete_user($id, $con){
     check_mysqliPrepareReturn($delete_stmt = mysqli_prepare($con, "DELETE FROM users WHERE id=?"), $con);
     check_mysqliBindReturn(mysqli_stmt_bind_param($delete_stmt, "i", $id), $con);
     check_mysqliExecuteReturn(mysqli_stmt_execute($delete_stmt), $con);
     if (!mysqli_stmt_affected_rows($delete_stmt)) {
-        $_SESSION['error_message'] = '<h3>Eliminazione fallita, si prega di riprovare più tardi</h3>';   
+        $_SESSION['error_message'] = 'Eliminazione fallita, si prega di riprovare più tardi';   
         error_log("Failed to delete user from the database: ". mysqli_error($con) ."\n", 3, "error.log"); 
         return;
     } 
-    $_SESSION['message'] = '<h3>Utente eliminato</h3>';
+    $_SESSION['message'] = 'Utente eliminato con successo';
     mysqli_stmt_close($delete_stmt);      
 }
 
@@ -75,7 +78,7 @@ function add_RememberMe($token, $expiration, $con){
     check_mysqliExecuteReturn(mysqli_stmt_execute($add_cookie_stmt), $con);
 
     if (mysqli_stmt_affected_rows($add_cookie_stmt)<=0) {
-        $_SESSION['error_message'] = "<span>Purtroppo non siamo riusciti a memorizzare l'opazione RememberMe, riprova più tardi</span>";
+        $_SESSION['error_message'] = "Purtroppo non siamo riusciti a memorizzare l'opazione RememberMe, riprova più tardi";
         error_log("Failed to add cookie to the database: ". mysqli_error($con) ."\n", 3, "error.log");
         mysqli_stmt_close($add_cookie_stmt);
     }          
@@ -90,34 +93,11 @@ function remove_RememberMe($con){
     check_mysqliExecuteReturn(mysqli_stmt_execute($remove_cookie_stmt), $con);
 
     if (mysqli_stmt_affected_rows($remove_cookie_stmt)<=0) {
-        $_SESSION['error_message'] = "<span>Si è verificato un errore, riprovare più tardi</span>";
+        $_SESSION['error_message'] = "Si è verificato un errore, riprovare più tardi";
         error_log("Failed to remove cookie from the database: ". mysqli_error($con) ."\n", 3, "error.log");
         mysqli_stmt_close($remove_cookie_stmt);
         return;
     }      
     mysqli_stmt_close($remove_cookie_stmt);
 }
-
-//TESTED
-function checkValideCookie($token, $con){
-    $check_cookie_stmt = mysqli_prepare($con, "SELECT email, admin, rememberMeToken, cookie_expiration FROM users WHERE rememberMeToken=? AND cookie_expiration > NOW()");
-    check_mysqliPrepareReturn($check_cookie_stmt, $con);
-    check_mysqliBindReturn(mysqli_stmt_bind_param($check_cookie_stmt, "s", $token), $con);
-    check_mysqliExecuteReturn(mysqli_stmt_execute($check_cookie_stmt), $con);
-    $result = mysqli_stmt_get_result($check_cookie_stmt);
-
-    if(mysqli_num_rows($result) == 1){
-            $row = mysqli_fetch_array($result);
-            $_SESSION["logged_in"] = true;
-            $_SESSION["email"] = $row["email"];
-            $_SESSION["admin"] = $row["admin"];  
-            mysqli_stmt_close($check_cookie_stmt);      
-            return true;     
-    }
-    else 
-        error_log("The cookie " . $token . " obtained from the browser at ". date('d-m-Y H:i:s') ." does not have matches in the database.\n", 3, "error.log");
-    mysqli_stmt_close($check_cookie_stmt);
-    return false;
-}
-
 ?>

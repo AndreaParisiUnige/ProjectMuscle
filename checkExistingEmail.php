@@ -5,11 +5,10 @@ require_once 'query.php';
 
 if ($_SERVER["REQUEST_METHOD"] === 'POST') {
     if (isset($_POST['email'])){
-        if (get_User($_POST['email'], $con) != null)
+        if (genericSelect("users", ['email'], 'email=?', [$_POST['email']], $con) != null)
             $existing_User = true;
         else
             $existing_User = false;
-
         http_response_code(200);
         header('Content-Type: application/json'); 
         echo json_encode(array("existing_User" => $existing_User));

@@ -6,7 +6,11 @@ require_once 'navbar.php';
 ?>
 
 <?php
-if ((isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) || (isset($_COOKIE["token"]) && checkValideCookie($_COOKIE["token"], $con))) {
+
+if (
+	(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) 
+	|| (isset($_COOKIE["token"]) && genericSelect("users", SELECT_PARAMS, WHERE_STMT, [$_COOKIE["token"]], $con))
+) {
 	header("Location: index.php");
 	exit;
 }
@@ -22,15 +26,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 		require_once 'query.php';
 		$hash =  password_hash(trim(($_POST["pass"])), PASSWORD_DEFAULT);
 		if (insert_user_data($_POST["firstname"], $_POST["lastname"], trim($_POST["email"]), $hash, $con)) {
-			$_SESSION['message'] = '<span>Registrazione completata<span>';
+			$_SESSION['message'] = 'Registrazione completata';
 			header("Location: login.php");
 			exit;
 		}
 	} catch (Exception $e) {
 		if (mysqli_errno($con) == 1062)
-			$_SESSION['error_message'] = "<span>Errore:account già registrato</span>";
+			$_SESSION['error_message'] = "Errore:account già registrato";
 		else
-			$_SESSION['error_message'] = "<span>Something went wrong</span>";
+			$_SESSION['error_message'] = "Qualcosa è andato storto...Riprova pià tardi";
 		error_log("Failed to insert user data into the database: " . $e->getMessage() . "\n", 3, "error.log");
 		reloadPage();
 	}
@@ -66,12 +70,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 			<label for="confirm" class="label">Conferma password:</label>
 			<input type="password" id="confirm" name="confirm" placeholder="Confirm your password">
 		</div>
-		<button  class="responsive secondary small small-elevate" type="submit">Sign in</button>
-	</form>
+		<button class="responsive secondary small small-elevate" type="submit">Sign in</button>
+		<div class="space"></div>
 
-	<?php
-	checkSessionError();
-	?>
+		<?php
+		checkSessionError();
+		?>
+	</form>
 </div>
 
 <script defer src="validateInput.js"></script>

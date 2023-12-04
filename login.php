@@ -4,7 +4,7 @@ ob_start();
 require_once 'header.php'; // Header contains the set_error_handler and the require_once for utils.php; 
 ?>
 
-<?php //TESTED
+<?php 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 	checkNotEmptyParams($_POST["email"], $_POST["pass"]);
@@ -17,24 +17,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 	$clean_pass = trim(($_POST["pass"]));
 
 	try {
-		$user = get_pwd_fromUser($email, $con);
+		$res = genericSelect("users", ['password', 'admin'], 'email=?', [$email], $con);
 	} catch (Exception $e) {
-		$_SESSION["error_message"] = "<span>Something went wrong</span>";
+		$_SESSION["error_message"] = "Qualcosa è andato storto...Riprova pià tardi";
 		header("Location: login.php");
 		error_log("Failed to search user data from the database: " . $e->getMessage() . "\n", 3, "error.log");
 	}
 
-	if (!empty($user))
-		if (password_verify($clean_pass, $user[0])) {
+	if (!empty($res)) {
+		if (password_verify($clean_pass, $res["password"])) {
 			$_SESSION["logged_in"] = true;
 			$_SESSION["email"] = $email;
-			$_SESSION["admin"] = $user[1];
+			$_SESSION["admin"] = $res["admin"];
 
 			require_once 'setcookie.php';
 			mysqli_close($con);
 			header("Location: reserved.php");
 			exit;
 		}
+	}
 	$_SESSION["error_message"] = "Errore: email o password errati\n";
 	header("Location: login.php");
 	exit;
@@ -61,12 +62,13 @@ require_once 'navbar.php';
 			<span>Remember Me</span>
 		</label>
 		<button class="responsive secondary small small-elevate" type="submit">Sign Up</button>
-	</form>
+		<div class="space"></div>
 
-	<?php
-	checkSessionError();	//Here to visualize error messages in the form
-	checkSessionMessage();	//Here to visualize success messages in the form
-	?>
+		<?php
+		checkSessionError();	//Possibily emptyField or wrongData errors
+		checkSessionMessage();	//Success message after successful registration
+		?>
+	</form>
 </div>
 
 <script defer src="validateInput.js"></script>

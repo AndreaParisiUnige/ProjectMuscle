@@ -17,7 +17,7 @@ if (isset($_COOKIE["token"])) {
     try {
         remove_RememberMe($con);
     } catch (Exception $e) {
-        $_SESSION['error_message'] = "<span>Something went wrong</span>";
+        $_SESSION['error_message'] = "Something went wrong";
         error_log("Failed to logout user: " . $e->getMessage() . "\n", 3, "error.log");
     }
 }
