@@ -36,68 +36,40 @@ function genericSelect($table, $select_Columns, $where, $toBind, $con){
     return null;
 }
 
-//CHECKED
 function insert_user_data($name, $lastname, $email, $hash, $con){
 
-    $insert_stmt = mysqli_prepare($con, "INSERT INTO users (id, nome, cognome, email, password, registration_date, admin)
-                                VALUES (NULL, ?, ?, ?, ?, NULL, 0)");
-
-    check_mysqliPrepareReturn($insert_stmt, $con);
-    check_mysqliBindReturn(mysqli_stmt_bind_param($insert_stmt, "ssss", $name, $lastname, $email, $hash), $con);
-    check_mysqliExecuteReturn(mysqli_stmt_execute($insert_stmt), $con);
+    $query = "INSERT INTO users (id, nome, cognome, email, password, registration_date, admin) VALUES (NULL, ?, ?, ?, ?, NULL, 0)";
+    check_mysqliFunction($insert_stmt = mysqli_prepare($con, $query), $con, 'prepare', $query);
+    check_mysqliFunction(mysqli_stmt_bind_param($insert_stmt, "ssss", $name, $lastname, $email, $hash), $con, 'bind', $query);
+    check_mysqliFunction(mysqli_stmt_execute($insert_stmt), $con, 'execute', $query);
 
     if (mysqli_stmt_affected_rows($insert_stmt)) {
         mysqli_stmt_close($insert_stmt);
         return true;   
     }
-    else {
-        error_log("Failed to insert the user" .$email. " into the database: ". mysqli_error($con) ."\n", 3, "error.log");   
-        mysqli_stmt_close($insert_stmt);
-        return false;
-    }
+    mysqli_stmt_close($insert_stmt);
 }
 
 function delete_user($id, $con){
-    check_mysqliPrepareReturn($delete_stmt = mysqli_prepare($con, "DELETE FROM users WHERE id=?"), $con);
-    check_mysqliBindReturn(mysqli_stmt_bind_param($delete_stmt, "i", $id), $con);
-    check_mysqliExecuteReturn(mysqli_stmt_execute($delete_stmt), $con);
-    if (!mysqli_stmt_affected_rows($delete_stmt)) {
-        $_SESSION['error_message'] = 'Eliminazione fallita, si prega di riprovare più tardi';   
-        error_log("Failed to delete user from the database: ". mysqli_error($con) ."\n", 3, "error.log"); 
-        return;
+    $query = "DELETE FROM users WHERE id=?";
+    check_mysqliFunction($delete_stmt = mysqli_prepare($con, $query), $con, 'prepare', $query);
+    check_mysqliFunction(mysqli_stmt_bind_param($delete_stmt, "i", $id), $con, 'bind', $query);
+    check_mysqliFunction(mysqli_stmt_execute($delete_stmt), $con, 'execute', $query);
+    if (mysqli_stmt_affected_rows($delete_stmt)) {
+        mysqli_stmt_close($delete_stmt);  
+        return true;
     } 
-    $_SESSION['message'] = 'Utente eliminato con successo';
-    mysqli_stmt_close($delete_stmt);      
+    mysqli_stmt_close($delete_stmt);  
 }
 
-//CHECKED
-function add_RememberMe($token, $expiration, $con){
-    $add_cookie_stmt = mysqli_prepare($con, "UPDATE users SET rememberMeToken=?, cookie_expiration=? WHERE email=?");
-    check_mysqliPrepareReturn($add_cookie_stmt, $con);
-    check_mysqliBindReturn(mysqli_stmt_bind_param($add_cookie_stmt, "sss", $token, $expiration, $_SESSION["email"]), $con);
-    check_mysqliExecuteReturn(mysqli_stmt_execute($add_cookie_stmt), $con);
+function manage_RememberMe($con, $token, $expiration, $email){
+    $query = "UPDATE users SET rememberMeToken=?, cookie_expiration=? WHERE email=?";
+    check_mysqliFunction($stmt = mysqli_prepare($con, $query), $con, 'prepare', $query);
+    check_mysqliFunction(mysqli_stmt_bind_param($stmt, "sss", $token, $expiration, $email), $con, 'bind', $query);
+    check_mysqliFunction(mysqli_stmt_execute($stmt), $con, 'execute', $query);
 
-    if (mysqli_stmt_affected_rows($add_cookie_stmt)<=0) {
-        $_SESSION['error_message'] = "Purtroppo non siamo riusciti a memorizzare l'opazione RememberMe, riprova più tardi";
-        error_log("Failed to add cookie to the database: ". mysqli_error($con) ."\n", 3, "error.log");
-        mysqli_stmt_close($add_cookie_stmt);
-    }          
-    mysqli_stmt_close($add_cookie_stmt);
-}
-
-//CHECKED
-function remove_RememberMe($con){
-    $remove_cookie_stmt = mysqli_prepare($con, "UPDATE users SET rememberMeToken=?, cookie_expiration=? WHERE email=?");
-    check_mysqliPrepareReturn($remove_cookie_stmt, $con);
-    check_mysqliBindReturn(mysqli_stmt_bind_param($remove_cookie_stmt, "sss", $nullToken, $nullToken, $_SESSION["email"]), $con);
-    check_mysqliExecuteReturn(mysqli_stmt_execute($remove_cookie_stmt), $con);
-
-    if (mysqli_stmt_affected_rows($remove_cookie_stmt)<=0) {
-        $_SESSION['error_message'] = "Si è verificato un errore, riprovare più tardi";
-        error_log("Failed to remove cookie from the database: ". mysqli_error($con) ."\n", 3, "error.log");
-        mysqli_stmt_close($remove_cookie_stmt);
-        return;
-    }      
-    mysqli_stmt_close($remove_cookie_stmt);
+    if (!mysqli_stmt_affected_rows($stmt)) 
+        throw new Exception($token. ": " . mysqli_error($con) ."\n");
+    mysqli_stmt_close($stmt);
 }
 ?>

@@ -31,11 +31,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 			exit;
 		}
 	} catch (Exception $e) {
-		if (mysqli_errno($con) == 1062)
-			$_SESSION['error_message'] = "Errore:account già registrato";
-		else
-			$_SESSION['error_message'] = "Qualcosa è andato storto...Riprova pià tardi";
-		error_log("Failed to insert user data into the database: " . $e->getMessage() . "\n", 3, "error.log");
+		$_SESSION['error_message'] = "Errore: qualcosa è andato storto, si prega di riprovare più tardi";
+		error_log("Failed to insert ". ($_POST["email"]). " data into the database: " . $e->getMessage() . "\n", 3, "error.log");
 		reloadPage();
 	}
 	mysqli_close($con);

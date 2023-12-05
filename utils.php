@@ -35,16 +35,12 @@ function validatePassword($pass, $confirm){
 }
 
 //Utils per gestione degli errori nelle query
-function check_mysqliPrepareReturn($return, $con){
-    if(!$return){
-        $_SESSION["error_message"] = "Errore: qualcosa è andato storto, si prega di riprovare più tardi\n";
-        error_log("Failed to prepare the query: ". mysqli_error($con) . "\n", 3, "error.log");
-        redirectBack();
-    }
-}
 function check_mysqliFunction($return, $con, $fun, $query){
     if(!$return){
-        $_SESSION["error_message"] = "Errore: qualcosa è andato storto, si prega di riprovare più tardi\n";
+        if (mysqli_errno($con) === 1062)
+			$_SESSION['error_message'] = "Errore:account già registrato";
+        else
+            $_SESSION["error_message"] = "Errore: qualcosa è andato storto, si prega di riprovare più tardi\n";
         $errorMessage = "Failed to complete the function '" . $fun ."'";
         if (!empty($query)) {
             $errorMessage .= " (Query: " . $query . ")";
@@ -55,32 +51,8 @@ function check_mysqliFunction($return, $con, $fun, $query){
     }
 }
 
-function check_mysqliBindReturn($return, $con){
-    if(!$return){
-        $_SESSION["error_message"] = "Errore: qualcosa è andato storto, si prega di riprovare più tardi\n";
-        error_log("Failed to bind the query: ". mysqli_error($con) . "\n", 3, "error.log");
-        redirectBack();
-    }
-}
-
-function check_mysqliExecuteReturn($return, $con){
-    if(!$return){
-        $_SESSION["error_message"] = "Errore: qualcosa è andato storto, si prega di riprovare più tardi\n";
-        error_log("Failed to execute the query: ". mysqli_error($con) . "\n", 3, "error.log");
-        redirectBack();
-    }
-}
-
-function check_mysqliGetResultReturn($return, $con){
-    if(!$return){
-        $_SESSION["error_message"] = "Errore: qualcosa è andato storto, si prega di riprovare più tardi\n";
-        error_log("Failed to get the result from the query: ". mysqli_error($con) . "\n", 3, "error.log");
-        redirectBack();
-    }
-}
-
 // Rimozione errori e warning da vista utente
-function errorHandler($errstr, $errfile, $errline) {
+function errorHandler($errno, $errstr, $errfile, $errline) {
     $_SESSION["error_message"] = "Errore: qualcosa è andato storto, si prega di riprovare più tardi\n";
     error_log("Errore o warning: $errstr in $errfile alla riga $errline\n", 3, "error.log");
     redirectBack();

@@ -7,18 +7,16 @@ ob_start();
 require_once 'connection.php';
 require_once 'utils.php';
 require_once 'query.php';
-set_error_handler("errorHandler");
 
-
-if (isset($_COOKIE["token"])) {
+if (isset($_COOKIE["token"]) && isset($_SESSION["email"])) {
     $expiration = time() - (86400 * 30);
     setcookie("token", "deleted", $expiration, "/");
 
     try {
-        remove_RememberMe($con);
+        manage_RememberMe($con, NULL , NULL , $_SESSION["email"]);
     } catch (Exception $e) {
-        $_SESSION['error_message'] = "Something went wrong";
-        error_log("Failed to logout user: " . $e->getMessage() . "\n", 3, "error.log");
+        $_SESSION['error_message'] = "Errore durante la fase di logout. Riprova più tardi.";
+        error_log("Failed to logout user " . $_SESSION["email"] . ": " . $e->getMessage() . "\n", 3, "error.log");
     }
 }
 if (isset($_COOKIE[session_name()])) {
