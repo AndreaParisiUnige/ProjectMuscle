@@ -167,25 +167,32 @@ function validateInputs(e, ...params) {
     });
 }
 
+addEventListener("DOMContentLoaded", function () {
+    let exist = false;
 
-const path = window.location.pathname;
-const pageName = path.split('/').pop();
-let exist = false;
+    document.querySelector('form').addEventListener('input', async function (e) {
+        if (page === 'registration.php') {
+            validateInputs(e, 'firstname', 'lastname', 'email', 'pass', 'confirm');
+            if (e.target && e.target.matches('input[type="email"]'))
+                exist = await checkExistingEmail();
+        }
+        else if (page === 'update_profile.php') {
+            validateInputs(e, 'firstname', 'lastname', 'email');
+            if (e.target && e.target.matches('input[type="email"]'))
+                exist = await checkExistingEmail();
+        }
+    });
 
-document.querySelector('form').addEventListener('input', async function (e) {
-    if (pageName === 'registration.php') {
-        validateInputs(e, 'firstname', 'lastname', 'email', 'pass', 'confirm');
-        if (e.target && e.target.matches('input[type="email"]'))
-            exist = await checkExistingEmail();
-    }
-});
-
-document.querySelector('form').addEventListener('submit', function (e) {
-    if (pageName === 'registration.php') {
-        if (exist || checkGlobalErrorNodes('firstname', 'lastname', 'email', 'pass', 'confirm')
-            || checkEmptyFields(e, 'firstname', 'lastname', 'email', 'pass', 'confirm'))
-            e.preventDefault();
-    }
-    else if (pageName === 'login.php')
-        validateInputs(e, 'email', 'pass');
+    document.querySelector('form').addEventListener('submit', function (e) {
+        if (page === 'registration.php') {
+            if (exist || checkGlobalErrorNodes('firstname', 'lastname', 'email', 'pass', 'confirm')
+                || checkEmptyFields(e, 'firstname', 'lastname', 'email', 'pass', 'confirm'))
+                e.preventDefault();
+        }
+        else if (page === 'login.php')
+            validateInputs(e, 'email', 'pass');
+        else if (page === 'update_profile.php') {
+            validateInputs(e, 'firstname', 'lastname', 'email');
+        }
+    });
 });

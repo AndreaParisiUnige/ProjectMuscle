@@ -1,5 +1,4 @@
 <?php
-session_start();
 ob_start();
 require_once 'header.php'; // Header contains the set_error_handler and the require_once for utils.php; 
 ?>
@@ -46,9 +45,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 require_once 'navbar.php';
 ?>
 
-<div>
-	<form id="form" action="login.php" method="post">
-		<h3>Login</h3>
+<div class="main_content">
+	<form class="inputForm" id="form" action="login.php" method="post" novalidate>
+	<input hidden type="text" id="sectionTitle" value="Login">
 		<div class="input-control">
 			<label for="email">Email:</label>
 			<input type="email" id="email" name="email" placeholder="Enter your email">
@@ -57,12 +56,11 @@ require_once 'navbar.php';
 			<label for="pass">Password:</label>
 			<input type="password" id="pass" name="pass" placeholder="Enter your password">
 		</div>
-		<label class="checkbox" for="checkbox">
+		<label for="checkbox" class="checkboxSect">
 			<input type="checkbox" id="checkbox" name="checkbox">
 			<span>Remember Me</span>
 		</label>
-		<button class="responsive secondary small small-elevate" type="submit">Sign Up</button>
-		<div class="space"></div>
+		<button class="responsive small small-elevate" id="submit_button" type="submit">Accedi</button>
 
 		<?php
 		checkSessionError();	//Possibily emptyField or wrongData errors

@@ -6,15 +6,13 @@ In caso di cookie valido vengono settati i parametri di sessione che permetteran
 -->
 
 <?php
-session_start();
 ob_start();
 require_once 'header.php';
-require_once 'navbar.php';
 checkSessionError();
 ?>
 
 <?php   
-    if ((isset($_COOKIE["token"]) && genericSelect("users", SELECT_PARAMS, WHERE_STMT, [$_COOKIE["token"]], $con)) 
+    if ((isset($_COOKIE["token"]) && genericSelect("users", SELECT_COOKIE, WHERE_STMT_COOKIE, [$_COOKIE["token"]], $con)) 
         || isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) {
         echo '<h1 style="text-align: center;">Welcome to the reserved page!</h1>';
         echo '<p style="text-align: center;">Logged in as: ' . $_SESSION["email"] . '</p>';

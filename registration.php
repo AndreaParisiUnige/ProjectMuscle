@@ -1,15 +1,13 @@
 <?php
-session_start();
 require_once 'utils.php';
 require_once 'header.php';
-require_once 'navbar.php';
 ?>
 
 <?php
 
 if (
 	(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) 
-	|| (isset($_COOKIE["token"]) && genericSelect("users", SELECT_PARAMS, WHERE_STMT, [$_COOKIE["token"]], $con))
+	|| (isset($_COOKIE["token"]) && genericSelect("users", SELECT_COOKIE, WHERE_STMT_COOKIE, [$_COOKIE["token"]], $con))
 ) {
 	header("Location: index.php");
 	exit;
@@ -24,8 +22,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 	try {
 		require_once 'connection.php';
 		require_once 'query.php';
+
 		$hash =  password_hash(trim(($_POST["pass"])), PASSWORD_DEFAULT);
-		if (insert_user_data($_POST["firstname"], $_POST["lastname"], trim($_POST["email"]), $hash, $con)) {
+		$toInsert = [
+			"id" => "NULL", 
+			"nome" => $_POST["firstname"], 
+			"cognome" => $_POST["lastname"], 
+			"email" => trim($_POST["email"]), 
+			"password" => $hash,
+			"registration_date" => NULL,
+			"admin" => 0
+		];
+
+		if (insert_data("users", $toInsert, $con)) {
 			$_SESSION['message'] = 'Registrazione completata';
 			header("Location: login.php");
 			exit;
@@ -40,9 +49,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 
-<div>
-	<form id=form action="registration.php" method="post" novalidate>
-	<h3>Registrazione</h3>
+<div class="main_content">
+	<form class="inputForm" id="form" action="registration.php" method="post" novalidate>
+		<input hidden type="text" id="sectionTitle" value="Registrazione">
 		<div class="input-control">
 			<label for="firstname">Nome:</label>
 			<input type="text" id="firstname" name="firstname" placeholder="Enter your name">
@@ -67,9 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 			<label for="confirm" class="label">Conferma password:</label>
 			<input type="password" id="confirm" name="confirm" placeholder="Confirm your password">
 		</div>
-		<button class="responsive secondary small small-elevate" type="submit">Sign in</button>
-		<div class="space"></div>
-
+		<button class="responsive small small-elevate" id="submit_button" type="submit">Registrati</button>
 		<?php
 		checkSessionError();
 		?>

@@ -1,8 +1,8 @@
 <?php
+    require_once ("header.php");
     require_once ("utils.php");
     ob_start();
     set_error_handler("errorHandler");
-    session_start();
 
     if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]===true && isset($_SESSION["admin"]) && $_SESSION["admin"]===1) {
         if (isset($_GET["id"]) && is_numeric($_GET["id"]))

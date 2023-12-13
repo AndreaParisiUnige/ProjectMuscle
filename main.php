@@ -1,19 +1,19 @@
-<section>
-    <article>
-        <h2>SAWcorn, the new startup in Genova</h2>
-        <div class="image-container">
-            <img src="unicorn.jpg" alt="Unicorno seduto">
+<main>
+    <div class="container">
+        <img src="curl.jpeg" alt="curl" style="width:100%">
+        <div class="image-text">
+            <h1 class="center-align">Articoli e Guide</h1>
+            <p>Scopri come costruire muscoli, bruciare grasso e rimanere motivato.
+                Queste guide ti insegneranno come raggiungere i tuoi obiettivi di salute e forma
+                fisica.
+            <p>
         </div>
+    </div>
 
-        <p> Conied in 2013 by venture capitalist Aileen Lee, the term "unicorn startup
-            refers to a private company valued at or over 1$ bilion - because just like the
-            mythical creature, the statistical rarity of such successful buisness venture is
-            improbable, but not impossible.
-        </p>
 
-    </article>
-
-    <aside>
-        For more information about other unicorn startups, see...
-    </aside>
-</section>
+    <section>
+        <div class="container">
+            
+        </div>
+    </section>
+</main>

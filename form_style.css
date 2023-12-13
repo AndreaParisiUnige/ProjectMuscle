@@ -1,20 +1,9 @@
-body {
-  background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-  font-family: 'Poppins', sans-serif;
-}
-
 #form {
-  width: 300px;
-  margin: 20vh auto 0 auto;
+  width: 60vh;  /* Larghezza 70% della pagina */
+  margin: 5vh auto auto auto;
   padding: 20px;
-  background-color: whitesmoke;
-  border-radius: 4px;
-  font-size: 12px;
-}
-
-#form h3 {
-  color: #0f2027;
-  text-align: center;
+  background-color: rgb(197, 203, 208);
+  border-radius: 10px;
 }
 
 .input-control {
@@ -22,23 +11,102 @@ body {
   flex-direction: column;
 }
 
+.input-control label{
+  font-size: 15px;
+}
+
 .input-control input {
 border: 2px solid #f0f0f0;
 border-radius: 4px;
 display: block;
 margin-bottom: 8px;
-font-size: 12px;
+font-size: 20px;
 padding: 10px;
 width: 100%;
 }
+
+.input-control2 {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-control2 label{
+  font-size: 15px;
+}
+
+.input-control2 input {
+  border: 2px solid #f0f0f0;
+  border-radius: 15px;
+  display: block;
+  margin-bottom: 8px;
+  font-size: 17px;
+  padding: 10px;
+  width: 100%;
+  }
 
 .input-control input:focus {
   outline: 0;
 }
 
 .input-control .errorDiv {
-  color: #ff3860;
-  font-size: 9px;
+  color: #a50727;
+  font-size: 12px;
   margin-bottom: 5px;
   height: 13px;
+}
+
+#submit_button {
+  margin: 20px 0px 10px 0px;
+  background-color: #3155cd;
+}
+
+#submit_button_profile {
+  background-color: #3155cd;
+  width: 100px;
+  margin-top: 30px;
+}
+
+#updateProfile {
+  margin-left: 100px;
+}
+
+#checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  margin-top: 12px;
+}
+
+.checkboxSect {
+  font-size: 15px;
+}
+
+/* Show profile */
+.profile {
+  display: flex;
+  align-items: center;
+  padding: 50px;
+  margin-top: 60px;
+  background-color: #cdcaca;
+  border-radius: 25px;
+  width: 70%;
+}
+
+.profile_image {
+  background-image: url('profile.avif');
+  height: 250px;
+  width: 250px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-left: 50px;
+}
+
+.columns {
+  display: flex;
+  flex-direction: row;
+}
+
+.col1, .col2 {
+  padding : 0px 50px 0px 50px;
 }

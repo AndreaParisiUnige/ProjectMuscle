@@ -1,5 +1,7 @@
 <?php
 
+require_once 'connection.php';
+
 function redirectBack() {
     $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'index.php'; 
     header("Location: $referer");
