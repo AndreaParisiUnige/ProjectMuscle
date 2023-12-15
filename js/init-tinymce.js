@@ -14,7 +14,7 @@ tinymce.init({
 	highlight_on_focus: true,
 	language: 'it',
 	placeholder: 'Start writing your article here...',
-	width: "100%",
+	width: "60%",
 	height: 450,
 
 	// Agginge un vincolo sulla prima riga dell'articolo: necessario un titolo.
@@ -27,8 +27,15 @@ tinymce.init({
 			if (firstLine !== '') {
 				const startsWithTitle = firstLine.startsWith('<h');
 				if (!startsWithTitle) {
-					editor.setContent('')
+					editor.setContent('');
 					alert("La prima linea dell'articolo deve essere un titolo!");
+				}
+				else {
+					const title = firstLine.replace(/<\/?[^>]+(>|$)/g, ''); // Rimuovi i tag HTML
+					if (title.length > 60) {
+						editor.setContent('');
+						alert("Il titolo non può superare i 55 caratteri!");
+					}
 				}
 			}
 		});

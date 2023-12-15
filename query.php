@@ -17,7 +17,9 @@ define('WHERE_STMT_COOKIE', 'rememberMeToken=? AND cookie_expiration > NOW()');
 // Il primo array può essere un regolare array, il secondo deve essere un array associativo
 // TODO: valutare sicurezza
 function genericSelect($table, $select_Columns, $where, $toBind, $con){
-    $query = "SELECT " . implode(", ", $select_Columns) . " FROM " . $table . " WHERE " . $where;
+    $query = "SELECT " . implode(", ", $select_Columns) . " FROM " . $table;
+    $query = isset($where) ? ($query . " WHERE " . $where) : $query;
+
     $stmt = mysqli_prepare($con, $query);
     check_mysqliFunction($stmt, $con, 'prepare', $query);
 
@@ -33,8 +35,13 @@ function genericSelect($table, $select_Columns, $where, $toBind, $con){
 
     mysqli_stmt_close($stmt);
     if($result && mysqli_num_rows($result) > 0){
-        $row = mysqli_fetch_array($result);  
-        return $row;
+        $rows = [];
+        while ($row = mysqli_fetch_array($result)) {
+            $rows[] = $row;  
+        }
+        if (count($rows) == 1) 
+            return $rows[0];
+        else return $rows;  
     }
     return null;
 }

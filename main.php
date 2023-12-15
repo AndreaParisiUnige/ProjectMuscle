@@ -11,9 +11,19 @@
     </div>
 
 
-    <section>
-        <div class="container">
-            
-        </div>
+    <section class="articlesContainer">
+        <?php 
+        $articles = genericSelect("articoli", ['*'], NULL, NULL, $con);
+        foreach ($articles as $article) {
+            $article['title'] = preg_replace('/<h([1-6])([^>]*)>/', '<h3$2>', $article['title']);
+            echo 
+                "<a href=\"article.php?id=" . $article['articleNum'] . "\">
+                <div class=\"articlePreview\">" .
+                "<div class=\"articleTitle\">" . $article['title'] . "</div>" . 
+                $article['article'] .
+                "</div></a>";
+        }
+        ?>
     </section>
 </main>
+

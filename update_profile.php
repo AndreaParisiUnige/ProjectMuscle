@@ -14,24 +14,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         "cognome" => $_POST["lastname"],
         "email" => $email
     ];
-    
-    if (isset($_POST["phone"]) && !empty($_POST["phone"])) 
+
+    if (isset($_POST["phone"]) && !empty($_POST["phone"]))
         $dataToUpdate["telefono"] = $_POST["phone"];
-    if (isset($_POST["address"]) && !empty($_POST["address"])) 
+    if (isset($_POST["address"]) && !empty($_POST["address"]))
         $dataToUpdate["indirizzo"] = $_POST["address"];
-    if (isset($_POST["age"]) && !empty($_POST["age"])) 
+    if (isset($_POST["age"]) && !empty($_POST["age"]))
         $dataToUpdate["eta"] = $_POST["age"];
 
     $user = genericSelect("users", ['id'], 'email=?', [$_SESSION['email']], $con);
-    
+
     try {
         if (update_UserData("users", $dataToUpdate, "id=?", [$user['id']], $con)) {
             $_SESSION['message'] = 'Profilo aggiornato';
             $_SESSION['email'] = $email;
         }
     } catch (Exception $e) {
-        $_SESSION['error_message'] = "Errore: qualcosa è andato storto, si prega di riprovare più tardi";
-        error_log("Failed to update ". ($_SESSION["email"]). "'s data in the database: " . $e->getMessage() . "\n", 3, "error.log");
+        $_SESSION['error_message'] = "Nessuna modifica effettuata";
+        error_log("Failed to update " . ($_SESSION["email"]) . "'s data in the database: " . $e->getMessage() . "\n", 3, "error.log");
     }
     mysqli_close($con);
     header("Location: show_profile.php");
@@ -50,4 +50,3 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     enableInputs();
 </script>
 <script defer src="validateInput.js"></script>
- 

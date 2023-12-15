@@ -1,8 +1,8 @@
 <?php
 ob_start();
 require_once "header.php";
-if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] === true && isset($_SESSION["admin"]) && $_SESSION["admin"] === 1) {}
-else {
+if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] === true && isset($_SESSION["admin"]) && $_SESSION["admin"] === 1) {
+} else {
     header("Location: index.php");
     exit();
 }
@@ -12,17 +12,20 @@ else {
 <script src="js/init-tinymce.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<form method="post" id="getDataForm" >
+
+<form method="post" id="getDataForm">
     <input hidden type="text" id="sectionTitle" value="Editor">
-    <textarea id="textarea" class = "elemento-senza-stile-beer"></textarea>
-    <button type="submit" id="submit">Submit</button>
+        <textarea id="textarea" class="elemento-senza-stile-beer"></textarea>
+    <button type="submit" id="submit_button">Submit</button>
 </form>
 
+
+
 <script>
-addEventListener("DOMContentLoaded", function(e){
+    addEventListener("DOMContentLoaded", function(e) {
 
         let form = document.getElementById("getDataForm");
-        form.addEventListener("submit", function(e){
+        form.addEventListener("submit", function(e) {
             e.preventDefault();
 
             let content = tinymce.get("textarea").getContent();
@@ -41,7 +44,7 @@ addEventListener("DOMContentLoaded", function(e){
                     content: contentHtml
                 };
                 $.post('addArticle.php', dataToSend, function(response) {
-                    
+
                 });
             }
         });
@@ -50,7 +53,7 @@ addEventListener("DOMContentLoaded", function(e){
 
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title']) && isset($_POST['content'])) {
-    $title = $_POST['title']; 
+    $title = $_POST['title'];
     $content = $_POST['content'];
     insert_data("articoli", ["articleNum" => "NULL", "title" => $title, "article" => $content], $con);
 
@@ -58,6 +61,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title']) && isset($_P
 } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION["error_message"] = "C'è stato un errore durante l'inserimento dell'articolo, riprovare più tardi";
 }
-require_once "footer.php" ;
+require_once "footer.php";
 ?>
-
