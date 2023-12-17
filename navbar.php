@@ -32,8 +32,9 @@
             <input type=text id="searchInput" placeholder="Cerca nel sito...">
         </div>
         <?php
-            echo '<a href="show_profile.php">
-                    <i class="large" id="accountCircle">account_circle</i>
+            echo 
+                '<a href="show_profile.php">
+                <i class="large" id="accountCircle">account_circle</i>
                 </a>';
         ?>
     </div>

@@ -36,4 +36,4 @@ set_error_handler("errorHandler");
         <h1 id="header_content"></h1>
     </div>
 
-    <script src="manageHeader.js" defer></script>
+    <script src="js/manageHeader.js" defer></script>

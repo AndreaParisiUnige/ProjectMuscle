@@ -49,4 +49,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
     enableInputs();
 </script>
-<script defer src="validateInput.js"></script>
+<script defer src="js/validateInput.js"></script>

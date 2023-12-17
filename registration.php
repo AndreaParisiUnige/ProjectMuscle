@@ -83,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 	</form>
 </div>
 
-<script defer src="validateInput.js"></script>
+<script defer src="js/validateInput.js"></script>
 
 <?php
 require_once 'footer.php';
