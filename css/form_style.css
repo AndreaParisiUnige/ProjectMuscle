@@ -55,6 +55,10 @@ width: 100%;
   height: 13px;
 }
 
+.input-control2.pass {
+  display: none;
+}
+
 #submit_button {
   margin: 20px 0px 10px 0px;
   background-color: #3155cd;
@@ -63,8 +67,21 @@ width: 100%;
 #submit_button_profile {
   background-color: #3155cd;
   width: 100px;
-  margin-top: 30px;
+  margin-top: 15px;
 }
+
+#editPass a:hover {
+  color: #3c61da;
+  text-decoration: underline;
+}
+
+#editPass {
+  color: #173aae;
+  font-family: 'Roboto Condensed', sans-serif;
+  margin-top: 10px;
+  font-size: 18px;
+}
+
 
 #updateProfile {
   margin-left: 100px;
@@ -93,7 +110,7 @@ width: 100%;
 }
 
 .profile_image {
-  background-image: url('profile.avif');
+  background-image: url('../images/profile.jpg');
   height: 250px;
   width: 250px;
   background-size: contain;
@@ -109,4 +126,12 @@ width: 100%;
 
 .col1, .col2 {
   padding : 0px 50px 0px 50px;
+}
+
+.deleteUserButton {
+  color: white; 
+  border: none; 
+  padding: 5px 10px; 
+  background-color: #3155cd;
+  width: 100px;
 }

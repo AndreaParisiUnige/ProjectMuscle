@@ -1,7 +1,7 @@
 <div class="comments-section">
   <h2>Commenti degli Utenti</h2>
   <div class="comments-container">
-    <!-- I commenti verranno inseriti qui -->
+
     <?php 
     $comments = genericSelect("commenti", ['*'], "articolo=?", [$_GET['id']], $con);
     if(isset($comments)){
@@ -16,23 +16,16 @@
                 <p class=\"comment-body\">" . $comment['testo'] . "</p>" . 
                 "</div>";
         }
-    }
+    } 
     ?>
-
-    <div class="comment">
-      <p class="comment-author">Mario Rossi</p>
-      <p class="comment-date">12 dicembre 2023</p>
-      <p class="comment-body">Ottimo articolo, molto informativo!</p>
-    </div>
-    <!-- Altri commenti ... -->
   </div>
 
   <div class="comment-form">
     <h3>Lascia un commento</h3>
-    <form id="commentForm" action="addComment.php" method="post">
+    <form id="commentForm" action="../article/addComment.php" method="post">
         <textarea id="comment" name="comment" placeholder="Scrivi un commento..." required></textarea>
         <input hidden type="text" id="article" name="article" value="<?php echo $_GET['id']; ?>">
-        <input hidden type="text" id="user" name="user" value="<?php echo $_SESSION['email']; ?>">
+        <input hidden type="text" id="user" name="user" value="<?php if (isset($_SESSION['email'])) echo $_SESSION['email']; ?>">
         <button type="submit" id="submit_button">Invia</button>
     </form>
   </div>

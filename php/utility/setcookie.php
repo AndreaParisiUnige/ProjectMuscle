@@ -1,5 +1,4 @@
 <?php
-    require_once 'connection.php';
     require_once 'query.php';
 
     if(isset($_POST['checkbox']) && $_POST['checkbox'] == 'on' && isset($_SESSION['email'])){
@@ -7,7 +6,7 @@
         $expiration = time() + (86400 * 30);
         setcookie("token", $token, $expiration, "/");
         try {
-            manage_RememberMe($con, $token, date('Y-m-d', $expiration), $_SESSION["email"]);
+            update_UserData("users", ['rememberMeToken' => $token, 'cookie_expiration' => date('Y-m-d', $expiration)], "email=?", [$_SESSION["email"]], $con);
         }
         catch (Exception $e){
             $_SESSION['error_message'] = "Non è stato possibile memorizzare l'opzione 'remember me'. Riprova più tardi.";

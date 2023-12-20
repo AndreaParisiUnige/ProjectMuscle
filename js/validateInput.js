@@ -176,8 +176,8 @@ addEventListener("DOMContentLoaded", function () {
             if (e.target && e.target.matches('input[type="email"]'))
                 exist = await checkExistingEmail();
         }
-        else if (page === 'update_profile.php') {
-            validateInputs(e, 'firstname', 'lastname', 'email');
+        else if (page === 'show_profile.php') {
+            validateInputs(e, 'firstname', 'lastname', 'email', 'pass', 'confirm');
             if (e.target && e.target.matches('input[type="email"]'))
                 exist = await checkExistingEmail();
         }

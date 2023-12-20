@@ -1,9 +1,6 @@
 <?php
-
-require_once 'connection.php';
-
 function redirectBack() {
-    $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'index.php'; 
+    $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '../structure/index.php'; 
     header("Location: $referer");
     exit();
 }
@@ -20,6 +17,10 @@ function checkNotEmptyParams(...$params){
             $_SESSION["error_message"] = "Errore: uno o più campi sono vuoti\n";
             redirectBack();
         }
+}
+
+function isSetAndNotEmpty($var) {
+    return isset($var) && !empty($var);
 }
 
 function validateEmail($email){
@@ -64,13 +65,13 @@ function errorHandler($errno, $errstr, $errfile, $errline) {
 // dalla precedente pagina di login
 function checkSessionError(){
     if (isset($_SESSION['error_message'])) {
-        echo "<div class='center-align'>" . $_SESSION['error_message'] . "</div>";
+        echo "<div class='center-align' id='message'>" . $_SESSION['error_message'] . "</div>";
         unset($_SESSION['error_message']); 
     }
 }
 function checkSessionMessage(){
     if (isset($_SESSION['message'])) {
-        echo "<div class='center-align'>" . $_SESSION['message'] . "</div>";
+        echo "<div class='center-align' id='message'>" . $_SESSION['message'] . "</div>";
         unset($_SESSION['message']); 
     }
 }
@@ -96,5 +97,40 @@ function setSessionParams($row){
     $_SESSION["email"] = $row["email"];
     $_SESSION["admin"] = $row["admin"];  
 }
+
+function ifCookieSetSessionParams($con){
+    if (isset($_COOKIE["token"])) {
+        if ($row = genericSelect("users", SELECT_COOKIE, WHERE_STMT_COOKIE, [$_COOKIE["token"]], $con))
+            setSessionParams($row);
+    }
+}
+
+function check_alreadyLoggedIn($con){
+    ifCookieSetSessionParams($con);
+    return (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]);
+}
+
+function exitIfLogged ($con) {
+    if (check_alreadyLoggedIn($con)) {
+        header("Location: ../structure/index.php");
+        exit;
+    }
+}
+
+function exitIfNotLogged ($con) {
+    if (!check_alreadyLoggedIn($con)) {
+        header("Location: ../structure/index.php");
+        exit;
+    }
+}
+
+function exitIfNotAdmin ($con) {
+    exitIfNotLogged ($con);
+    if (!isset($_SESSION["admin"])) {
+        header("Location: ../structure/index.php");
+        exit;
+    }
+}
+
 
 ?>

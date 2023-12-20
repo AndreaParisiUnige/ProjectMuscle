@@ -1,16 +1,13 @@
 <?php
 ob_start();
-require_once 'header.php'; // Header contains the set_error_handler and the require_once for utils.php; 
-?>
+require_once '../structure/header.php'; 
 
-<?php 
+exitIfLogged($con);
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 	checkNotEmptyParams($_POST["email"], $_POST["pass"]);
 	validateEmail($_POST["email"]);
-
-	require_once 'connection.php';
-	require_once 'query.php';
 
 	$email = trim($_POST["email"]);
 	$clean_pass = trim(($_POST["pass"]));
@@ -19,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 		$res = genericSelect("users", ['password', 'admin'], 'email=?', [$email], $con);
 	} catch (Exception $e) {
 		$_SESSION["error_message"] = "Qualcosa è andato storto...Riprova pià tardi";
-		header("Location: login.php");
+		header("Location: ../user/login.php");
 		error_log("Failed to search user data from the database: " . $e->getMessage() . "\n", 3, "error.log");
 	}
 
@@ -29,21 +26,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 			$_SESSION["email"] = $email;
 			$_SESSION["admin"] = $res["admin"];
 
-			require_once 'setcookie.php';
+			require_once '../utility/setcookie.php';
 			mysqli_close($con);
-			header("Location: reserved.php");
+			header("Location: ../structure/index.php");
 			exit;
 		}
 	}
 	$_SESSION["error_message"] = "Errore: email o password errati\n";
-	header("Location: login.php");
+	reloadPage();
 	exit;
 }
 ?>
 
-<?php
-require_once 'navbar.php';
-?>
 
 <div class="main_content">
 	<form class="inputForm" id="form" action="login.php" method="post" novalidate>
@@ -61,16 +55,11 @@ require_once 'navbar.php';
 			<span>Remember Me</span>
 		</label>
 		<button class="responsive small small-elevate" id="submit_button" type="submit">Accedi</button>
-
-		<?php
-		checkSessionError();	//Possibily emptyField or wrongData errors
-		checkSessionMessage();	//Success message after successful registration
-		?>
 	</form>
 </div>
 
-<script defer src="js/validateInput.js"></script>
+<script defer src="../../js/validateInput.js"></script>
 
 <?php
-require_once 'footer.php';
+require_once '../structure/footer.php';
 ?>

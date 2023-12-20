@@ -58,11 +58,6 @@ nav li:not(:last-child)::after {
   padding: 8px;
 }
 
-/* Immagine home */
-.container {
-  text-align: center;
-}
-
 .image-text {
   position: absolute;
   top: 50%;
@@ -109,6 +104,7 @@ nav li:not(:last-child)::after {
   display: flex;
   justify-content: center;
   align-items: center;
+  text-align: center;
 }
 
 footer {

@@ -5,8 +5,9 @@
     Se invece fallisce una funzione il cui motivo di fallimento non è noto, viene memorizzato
     su un file di log l'errore e si invia all'utente un messaggio d'errore generico.
 */
-require_once 'utils.php';
-set_error_handler("errorHandler");
+require_once '../utility/utils.php';
+require_once '../utility/connection.php';
+
 
 define('SELECT_COOKIE', ['email', 'admin', 'rememberMeToken', 'cookie_expiration']);
 define('WHERE_STMT_COOKIE', 'rememberMeToken=? AND cookie_expiration > NOW()');
@@ -15,7 +16,6 @@ define('WHERE_STMT_COOKIE', 'rememberMeToken=? AND cookie_expiration > NOW()');
 // Richiede la tabella su cui fare la query, divide un array in stringhe separate da virgola e le concatena
 // per comporre la select. Richiede una stringa per comporre il where e un array con i tipi di dato da inserire
 // Il primo array può essere un regolare array, il secondo deve essere un array associativo
-// TODO: valutare sicurezza
 function genericSelect($table, $select_Columns, $where, $toBind, $con){
     $query = "SELECT " . implode(", ", $select_Columns) . " FROM " . $table;
     $query = isset($where) ? ($query . " WHERE " . $where) : $query;
@@ -75,17 +75,6 @@ function delete_user($id, $con){
         return true;
     } 
     mysqli_stmt_close($delete_stmt);  
-}
-
-function manage_RememberMe($con, $token, $expiration, $email){
-    $query = "UPDATE users SET rememberMeToken=?, cookie_expiration=? WHERE email=?";
-    check_mysqliFunction($stmt = mysqli_prepare($con, $query), $con, 'prepare', $query);
-    check_mysqliFunction(mysqli_stmt_bind_param($stmt, "sss", $token, $expiration, $email), $con, 'bind', $query);
-    check_mysqliFunction(mysqli_stmt_execute($stmt), $con, 'execute', $query);
-
-    if (!mysqli_stmt_affected_rows($stmt)) 
-        throw new Exception($token. ": " . mysqli_error($con) ."\n");
-    mysqli_stmt_close($stmt);
 }
 
 // Si aspetta in input un array associativo con i nomi delle colonne e i valori da inserire

@@ -1,0 +1,1 @@
+Failed to update admin@gmail.com's data in the database: error in 'UPDATE users SET nome=?, cognome=?, email=?, telefono=?, indirizzo=?, eta=? WHERE id=?': 

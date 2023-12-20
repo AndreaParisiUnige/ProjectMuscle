@@ -1,17 +1,7 @@
 <?php
-require_once 'utils.php';
-require_once 'header.php';
-?>
+require_once '../structure/header.php';
 
-<?php
-
-if (
-	(isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) 
-	|| (isset($_COOKIE["token"]) && genericSelect("users", SELECT_COOKIE, WHERE_STMT_COOKIE, [$_COOKIE["token"]], $con))
-) {
-	header("Location: index.php");
-	exit;
-}
+exitIfLogged($con);
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -19,24 +9,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 	validateEmail($_POST["email"]);
 	validatePassword($_POST["pass"], $_POST["confirm"]);
 
+	$hash =  password_hash(trim(($_POST["pass"])), PASSWORD_DEFAULT);
+	$toInsert = [
+		"id" => "NULL", 
+		"nome" => $_POST["firstname"], 
+		"cognome" => $_POST["lastname"], 
+		"email" => trim($_POST["email"]), 
+		"password" => $hash,
+		"registration_date" => NULL,
+		"admin" => 0
+	];
+
 	try {
-		require_once 'connection.php';
-		require_once 'query.php';
-
-		$hash =  password_hash(trim(($_POST["pass"])), PASSWORD_DEFAULT);
-		$toInsert = [
-			"id" => "NULL", 
-			"nome" => $_POST["firstname"], 
-			"cognome" => $_POST["lastname"], 
-			"email" => trim($_POST["email"]), 
-			"password" => $hash,
-			"registration_date" => NULL,
-			"admin" => 0
-		];
-
 		if (insert_data("users", $toInsert, $con)) {
 			$_SESSION['message'] = 'Registrazione completata';
-			header("Location: login.php");
+			header("Location: ../user/login.php");
 			exit;
 		}
 	} catch (Exception $e) {
@@ -77,14 +64,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 			<input type="password" id="confirm" name="confirm" placeholder="Confirm your password">
 		</div>
 		<button class="responsive small small-elevate" id="submit_button" type="submit">Registrati</button>
-		<?php
-		checkSessionError();
-		?>
 	</form>
 </div>
 
-<script defer src="js/validateInput.js"></script>
+<script defer src="../../js/validateInput.js"></script>
 
 <?php
-require_once 'footer.php';
+require_once '../structure/footer.php';
 ?>
