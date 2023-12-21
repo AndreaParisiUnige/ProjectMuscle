@@ -9,7 +9,7 @@ if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) {
         setcookie("token", "deleted", $expiration, "/");
 
         try {
-            update_UserData("users", ['rememberMeToken' => NULL, 'cookie_expiration' => NULL], "email=?", [$_SESSION["email"]], $con);
+            generic_Update("users", ['rememberMeToken' => NULL, 'cookie_expiration' => NULL], "email=?", [$_SESSION["email"]], $con);
         } catch (Exception $e) {
             $_SESSION['error_message'] = "Errore durante la fase di logout. Riprova più tardi.";
             error_log("Failed to logout user " . $_SESSION["email"] . ": " . $e->getMessage() . "\n", 3, "error.log");

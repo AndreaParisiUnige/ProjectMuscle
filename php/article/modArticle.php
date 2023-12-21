@@ -3,9 +3,16 @@ require_once "../structure/header.php";
 exitIfNotAdmin($con);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['title']) && isset($_POST['content']) && isset($_POST['request'])) {
-        $title = $_POST['title'];
-        $content = $_POST['content'];
+    echo "<script>    alert('ciao');</script>";
+    $title = $_POST['title'];
+    echo ($content = $_POST['content']);
+    echo ($articleNum = $_POST['articleNum']);
+    echo "<script>    var title = `<?php echo $title; ?>`;
+            var content = `<?php echo $content; ?>`;
+            tinymce.get(\"textarea\").setContent(title + content);</script>";
+    echo "<input type=\"hidden\" name=\"request\" id=\"request\" value=\"update\">";
+    if (isset($_POST['title']) && isset($_POST['content']) && isset($_POST['request']) && isset($_POST['articleNum'])) {
+
         if ($_POST['request'] === 'add') {
             try {
                 if (insert_data("articoli", ["articleNum" => "NULL", "title" => $title, "article" => $content], $con))
@@ -16,9 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 error_log("Failed to insert data into the database: " . $e->getMessage() . "\n", 3, "error.log");
                 http_response_code(500);
             }
-        } else if (isset($_POST['articleNum']) && isset($_POST['request']) && $_POST['request'] === 'update') {
-            $articleNum = $_POST['articleNum'];
-            echo "<input type=\"hidden\" name=\"request\" id=\"request\" value=\"update\">";
         }
     }
 } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -59,18 +63,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     content: contentHtml,
                     request: 'add'
                 };
-                $.post('addArticle.php', dataToSend) // Richiesta AJAX
+                $.post('modArticle.php', dataToSend) // Richiesta AJAX
                     .done(function() {
                         alert("Articolo inserito con successo!");
                     })
                     .fail(function() {
                         alert("C'è stato un errore durante l'inserimento dell'articolo, riprovare più tardi");
                     });
-                tinymce.get("textarea").setContent('');
+                
+
             }
+            var savedData = localStorage.getItem('articleData');
+
+                if (savedData) {
+                    var articleData = JSON.parse(savedData);
+
+                    tinymce.get("textarea").setContent(articleData.title + articleData.content);
+                }
         });
-        if (document.getElementById("request").value === "update")
-            tinymce.get("textarea").setContent(title + content);
     });
 </script>
 

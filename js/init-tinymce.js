@@ -3,14 +3,13 @@ var height60Percent = windowHeight * 0.6;
 
 tinymce.init({
 	selector: "#textarea",
-
 	auto_focus: 'textarea',
 	highlight_on_focus: true,
 	language: 'it',
 	placeholder: 'Start writing your article here...',
 	width: "80%",
-	height: height60Percent+'px',
-
+	height: height60Percent + 'px',
+	
 	// Agginge un vincolo sulla prima riga dell'articolo: necessario un titolo.
 	setup: function (editor) {
 		editor.on('keyup', function () {
@@ -31,6 +30,14 @@ tinymce.init({
 						alert("Il titolo non può superare i 55 caratteri!");
 					}
 				}
+			}
+		});
+		editor.on('init', function () {
+			var savedData = localStorage.getItem('articleData');
+			if (savedData) {
+				var articleData = JSON.parse(savedData);
+				tinymce.get("textarea").setContent(articleData.title + articleData.content);
+				localStorage.removeItem('articleData');
 			}
 		});
 	},

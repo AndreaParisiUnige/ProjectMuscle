@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     try {
         $user = genericSelect("users", ['id'], 'email=?', [$_SESSION['email']], $con);
         if ($user) {
-            if (update_UserData("users", $dataToUpdate, "id=?", [$user['id']], $con)) {
+            if (generic_Update("users", $dataToUpdate, "id=?", [$user['id']], $con)) {
                 $_SESSION['message'] = 'Profilo aggiornato';
                 $_SESSION['email'] = isset($email) ? $email : $_SESSION['email'];
             }

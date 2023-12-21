@@ -6,7 +6,7 @@
         $expiration = time() + (86400 * 30);
         setcookie("token", $token, $expiration, "/");
         try {
-            update_UserData("users", ['rememberMeToken' => $token, 'cookie_expiration' => date('Y-m-d', $expiration)], "email=?", [$_SESSION["email"]], $con);
+            generic_Update("users", ['rememberMeToken' => $token, 'cookie_expiration' => date('Y-m-d', $expiration)], "email=?", [$_SESSION["email"]], $con);
         }
         catch (Exception $e){
             $_SESSION['error_message'] = "Non è stato possibile memorizzare l'opzione 'remember me'. Riprova più tardi.";

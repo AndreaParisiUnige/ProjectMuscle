@@ -2,11 +2,8 @@
 require_once("../structure/header.php");
 exitIfNotAdmin($con);
 
-if (isset($_GET["id"]) && is_numeric($_GET["id"]))
-    $id = $_GET["id"];
-else if (isset($_POST["id"]) && is_numeric($_POST["id"]))
-    $id = $_POST["id"];
-else {
+$id = requireId();
+if (!$id){
     header("Location: ../user/allusers.php");
     exit;
 }

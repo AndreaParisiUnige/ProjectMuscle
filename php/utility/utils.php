@@ -110,6 +110,11 @@ function check_alreadyLoggedIn($con){
     return (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]);
 }
 
+function check_admin($con){
+    ifCookieSetSessionParams($con);
+    return (isset($_SESSION["admin"]) && $_SESSION["admin"]);
+}
+
 function exitIfLogged ($con) {
     if (check_alreadyLoggedIn($con)) {
         header("Location: ../structure/index.php");
@@ -126,10 +131,17 @@ function exitIfNotLogged ($con) {
 
 function exitIfNotAdmin ($con) {
     exitIfNotLogged ($con);
-    if (!isset($_SESSION["admin"])) {
+    if (!isset($_SESSION["admin"]) || !$_SESSION["admin"]) {
         header("Location: ../structure/index.php");
         exit;
     }
+}
+
+function requireId(){
+    if (isset($_GET["id"]) && is_numeric($_GET["id"]))
+        return $_GET["id"];
+    else if (isset($_POST["id"]) && is_numeric($_POST["id"]))
+        return $_POST["id"];
 }
 
 
