@@ -6,7 +6,7 @@ require_once '../utility/query.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["comment"])) {
     if (!isset($_SESSION["email"])) {
         $_SESSION["error_message"] = "Per poter commentare devi essere loggato.";
-        header("Location: ../article/article.php?id=". $_POST["article"]);
+        header("Location: ../user/login.php");
         exit;
     }
     $comment = htmlspecialchars($_POST["comment"]);
