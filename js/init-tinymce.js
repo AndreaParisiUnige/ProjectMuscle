@@ -1,3 +1,6 @@
+var windowHeight = window.innerHeight;
+var height60Percent = windowHeight * 0.6;
+
 tinymce.init({
 	selector: "#textarea",
 
@@ -5,8 +8,8 @@ tinymce.init({
 	highlight_on_focus: true,
 	language: 'it',
 	placeholder: 'Start writing your article here...',
-	width: "60%",
-	height: 450,
+	width: "80%",
+	height: height60Percent+'px',
 
 	// Agginge un vincolo sulla prima riga dell'articolo: necessario un titolo.
 	setup: function (editor) {

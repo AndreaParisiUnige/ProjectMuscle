@@ -19,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title']) && isset($_P
 } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     http_response_code(405);   // Metodo non consentito
 }
-require_once "../structure/footer.php";
 ?>
 
 <script src="https://cdn.tiny.cloud/1/f2g36280gpqhu8xldrdcbuuenjw5jljdxuhg1bosjhmsxm97/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
@@ -67,3 +66,7 @@ require_once "../structure/footer.php";
         });
     });
 </script>
+
+<?php
+require_once "../structure/footer.php";
+?>

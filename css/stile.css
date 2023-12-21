@@ -1,10 +1,10 @@
 html {
-  max-width: 100%;
+  width: 100%;
 }
 
 body {
   margin: 0 auto;
-  max-width: 100%;
+  width: 100%;
   background-color: #ffffff;
 }
 
@@ -132,7 +132,7 @@ footer {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  padding: 50px 280px;
+  padding: 50px 5%;
   gap: 80px;
 }
 
