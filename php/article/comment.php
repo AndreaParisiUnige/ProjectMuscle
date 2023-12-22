@@ -15,7 +15,10 @@
                 <p class=\"comment-author\">" . $comment['utente'] . "</p>
                 <p class=\"comment-date\">" . $comment['data_inserimento'] . "</p>
                 <p class=\"comment-body\">" . $comment['testo'] . "</p>" .
-          "</div>" . "<button class= \"square round medium red\" value=\"" . $comment['id_commento'] . "\">X</a></div>";
+          "</div>";
+        if (check_admin($con))
+          echo "<button class= \"square round medium red\" value=\"" . $comment['id_commento'] . "\">X</a>";
+        echo "</div>";
       }
     }
     ?>
