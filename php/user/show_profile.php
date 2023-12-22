@@ -82,23 +82,5 @@ try {
     </div>
 </div>
 
-<script>
-    document.getElementById("editPass").addEventListener("click", function(e) {
-        e.preventDefault();
-        let elements = document.getElementsByClassName("input-control2");
-        for (let i = 0; i < elements.length; i++) {
-            if (elements[i].classList.contains("pass"))
-                elements[i].style.display = 'block';
-            else {
-                elements[i].style.display = 'none';
-                elements[i].getElementsByTagName("input")[0].removeAttribute("value");
-            }
-        }
-        document.getElementById("editPass").remove();
-        if (document.getElementById("message")) {
-            document.getElementById("message").remove();
-        }
-    });
-</script>
-
+<script src="../../js/manageProfile.js"></script>
 <script defer src="../../js/validateInput.js"></script>

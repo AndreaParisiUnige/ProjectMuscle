@@ -40,4 +40,4 @@
     </section>
 </main>
 
-<script src="../../js/manageArticles.js"> </script>
+<script src="../../js/showArticles.js"> </script>

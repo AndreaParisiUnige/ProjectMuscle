@@ -1,6 +1,10 @@
 <?php
 require_once("../utility/query.php");
 session_start();
+if (!check_alreadyLoggedIn($con)) {
+    header("Location: ../user/login.php");
+    exit;
+}
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Necessario in caso di modifica della sola password, in quanto i campi vengono inviati vuoti
@@ -32,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($user) {
             if (generic_Update("users", $dataToUpdate, "id=?", [$user['id']], $con)) {
                 $_SESSION['message'] = 'Profilo aggiornato';
-                $_SESSION['email'] = isset($email) ? $email : $_SESSION['email'];
+                $_SESSION['email'] = isset($email) ? $email : $_SESSION['email'];   // Se aggiornata la mail aggiorno anche la sessione
             }
         }
     } catch (Exception $e) {

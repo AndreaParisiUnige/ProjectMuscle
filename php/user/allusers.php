@@ -1,8 +1,6 @@
 <?php
 require_once '../structure/header.php';
-
-if (!check_alreadyLoggedIn($con))
-    header("Location: ../structure/index.php");
+exitIfNotAdmin($con);
 
 $query = "SELECT id, nome, cognome, email, admin FROM users"; // Prepared statement non necessario
 

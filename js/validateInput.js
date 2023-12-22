@@ -129,26 +129,26 @@ async function checkExistingEmail() {
             headers: { "Content-type": "application/x-www-form-urlencoded" },
             body: `email=${emailVal}`
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Errore nella richiesta');
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Errore nella richiesta');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.existing_User) {
+                if (!existingEmailError) {
+                    errorNodeEmail = createErrorNode('email', ErrorMessages.ALREADY_EXISTS, 'AlreadyExist');
+                    toggleError(emailNode, errorNodeEmail, true, true);
                 }
-                return response.json();
-            })
-            .then(data => {
-                if (data.existing_User) {
-                    if (!existingEmailError) {
-                        errorNodeEmail = createErrorNode('email', ErrorMessages.ALREADY_EXISTS, 'AlreadyExist');
-                        toggleError(emailNode, errorNodeEmail, true, true);
-                    }
-                    return true;
-                }
-                else if (!hasError)
-                    toggleError(emailNode, existingEmailError, false, true);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+                return true;
+            }
+            else if (!hasError)
+                toggleError(emailNode, existingEmailError, false, true);
+        })
+        .catch(error => {
+            console.log(error);
+        });
     }
     else if (existingEmailError)
         toggleError(emailNode, existingEmailError, false, !hasError ? null : false);

@@ -8,7 +8,7 @@ if (!$id){
     exit;
 }
 try {
-    if (delete_user($id, $con))
+    if (generic_Delete("users", "id=?", [$id], $con)) 
         $_SESSION['message'] = 'Utente eliminato con successo';
 } catch (Exception $e) {
     $_SESSION['error_message'] = "Errore: qualcosa è andato storto, si prega di riprovare più tardi";

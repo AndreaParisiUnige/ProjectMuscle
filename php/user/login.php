@@ -1,7 +1,6 @@
 <?php
 ob_start();
 require_once '../structure/header.php'; 
-
 exitIfLogged($con);
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {

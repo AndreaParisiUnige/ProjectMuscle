@@ -6,7 +6,7 @@ require_once '../utility/query.php';
 if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) {
     if (isset($_COOKIE["token"]) && isset($_SESSION["email"])) {
         $expiration = time() - (86400 * 30);
-        setcookie("token", "deleted", $expiration, "/");
+        setcookie("token", "deleted", $expiration, "/");    // Distruggo cookie utente
 
         try {
             generic_Update("users", ['rememberMeToken' => NULL, 'cookie_expiration' => NULL], "email=?", [$_SESSION["email"]], $con);
@@ -15,7 +15,7 @@ if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"]) {
             error_log("Failed to logout user " . $_SESSION["email"] . ": " . $e->getMessage() . "\n", 3, "error.log");
         }
     }
-    if (isset($_COOKIE[session_name()])) {
+    if (isset($_COOKIE[session_name()])) {  // Distruggo cookie di sessione
         setcookie(session_name(), '', time() - 3600, '/');
     }
     session_destroy();

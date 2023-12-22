@@ -25,7 +25,7 @@ try {
         http_response_code(404);
         exit;
     }
-    if (generic_delete($table, $idName . "=?", [$id], $con)){
+    if (generic_Delete($table, $idName . "=?", [$id], $con)){
         http_response_code(200);
         header("Location: ../structure/index.php");
     }

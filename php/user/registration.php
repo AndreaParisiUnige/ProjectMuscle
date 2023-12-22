@@ -1,6 +1,5 @@
 <?php
 require_once '../structure/header.php';
-
 exitIfLogged($con);
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -21,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 	];
 
 	try {
-		if (insert_data("users", $toInsert, $con)) {
+		if (generic_Insert("users", $toInsert, $con)) {
 			$_SESSION['message'] = 'Registrazione completata';
 			header("Location: ../user/login.php");
 			exit;

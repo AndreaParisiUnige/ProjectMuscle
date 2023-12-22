@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["comment"])) {
     $user = htmlspecialchars($_POST["user"]);
     $article = $_POST["article"];
 
-    if (insert_data("commenti", ["articolo" => $article, "utente" => $user, "testo" => $comment], $con)) {
+    if (generic_Insert("commenti", ["articolo" => $article, "utente" => $user, "testo" => $comment], $con)) {
         $_SESSION["message"] = "Commento inserito con successo.";
     } else {
         $_SESSION["error_message"] = "Errore nell'inserimento del commento.";

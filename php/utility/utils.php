@@ -1,4 +1,5 @@
 <?php
+//Gestione pagina
 function redirectBack() {
     $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '../structure/index.php'; 
     header("Location: $referer");
@@ -10,7 +11,9 @@ function reloadPage() {
     exit();
 }
 
-//Utils per la validazione dei dati
+/*****************************************************************************************/
+
+//Validazione dei dati
 function checkNotEmptyParams(...$params){
     foreach ($params as $param) 
         if (empty($param)) {
@@ -37,7 +40,9 @@ function validatePassword($pass, $confirm){
     }
 }
 
-//Utils per gestione degli errori nelle query
+/*****************************************************************************************/
+
+//Gestione degli errori nelle query
 function check_mysqliFunction($return, $con, $fun, $query){
     if(!$return){
         if (mysqli_errno($con) === 1062)
@@ -61,8 +66,7 @@ function errorHandler($errno, $errstr, $errfile, $errline) {
     redirectBack();
 }
 
-// Per verificare la presenza di errori memorizzati nella sessione, ad esempio
-// dalla precedente pagina di login
+// Errori di sessione
 function checkSessionError(){
     if (isset($_SESSION['error_message'])) {
         echo "<div class='center-align' id='message'>" . $_SESSION['error_message'] . "</div>";
@@ -76,6 +80,8 @@ function checkSessionMessage(){
     }
 }
 
+/*****************************************************************************************/
+// Query
 function getTypes($valori){
     $tipi = '';
     foreach ($valori as $valore) {
@@ -92,6 +98,8 @@ function getTypes($valori){
     return $tipi;
 }
 
+/*****************************************************************************************/
+// Controlli login/admin, cookie e presenza id
 function setSessionParams($row){
     $_SESSION["logged_in"] = true;
     $_SESSION["email"] = $row["email"];
@@ -100,7 +108,9 @@ function setSessionParams($row){
 
 function ifCookieSetSessionParams($con){
     if (isset($_COOKIE["token"])) {
-        if ($row = genericSelect("users", SELECT_COOKIE, WHERE_STMT_COOKIE, [$_COOKIE["token"]], $con))
+        $select_Cookie = ['email', 'admin', 'rememberMeToken', 'cookie_expiration'];
+        $where_stmt_Cookie = "rememberMeToken=? AND cookie_expiration > NOW()";
+        if ($row = genericSelect("users", $select_Cookie, $where_stmt_Cookie, [$_COOKIE["token"]], $con))
             setSessionParams($row);
     }
 }

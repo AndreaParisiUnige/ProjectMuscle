@@ -24,46 +24,19 @@ if (isset($_GET['id'])) {
     }
 } else {
     $_SESSION["error_message"] = "Impossibile caricare correttamente la pagina.";
+    header("Location: ../structure/index.php");
 }
 require_once "../structure/footer.php";
 ?>
 
 <script>
     $(document).ready(function() {
-        var articleId = <?php echo $articleId; ?>;
+        let articleId = <?php echo $articleId; ?>;
+        var title = `<?php echo $title; ?>`;
+        var content = `<?php echo $content; ?>`;
 
-        $('#updateArticle').click(function() {
-            var title = `<?php echo $title; ?>`;
-            var content = `<?php echo $content; ?>`;
+        updateArticle(articleId, title, content);
 
-            var dataToSend = {
-                articleNum: articleId,
-                title: title,
-                content: content,
-                request: 'update'
-            };
-
-            localStorage.setItem('articleData', JSON.stringify(dataToSend));
-            window.location.href = "../article/addArticle.php?";
-        });
-        
-        $('#deleteArticle').click(function() {
-            if (confirm("Sei sicuro di voler eliminare questo articolo?")) {
-                var dataToSend = {
-                    id : articleId,
-                    table: "articoli",
-                    idName: "articleNum"
-                };
-                $.post("../article/delete.php", dataToSend)
-                    .done(function() {
-                        window.location.href = '../structure/index.php';
-                        alert("Articolo eliminato con successo!");
-                    })
-                    .fail(function() {
-                        alert("Non è possibile eliminare l'articolo");
-                    });
-            }
-
-        });
+        deleteArticle(articleId);
     });
 </script>

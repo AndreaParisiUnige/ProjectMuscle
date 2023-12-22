@@ -1,21 +1,11 @@
 <?php
-/*  La logica di controllo degli errori applicata è la seguente: se falliscono funzioni
-    il cui motivo di fallimento è noto (es. tentativo di inserire un utente già esistente)
-    viene stampato un messaggio di errore specifico all'utente. 
-    Se invece fallisce una funzione il cui motivo di fallimento non è noto, viene memorizzato
-    su un file di log l'errore e si invia all'utente un messaggio d'errore generico.
-*/
 require_once '../utility/utils.php';
 require_once '../utility/connection.php';
 
 
-define('SELECT_COOKIE', ['email', 'admin', 'rememberMeToken', 'cookie_expiration']);
-define('WHERE_STMT_COOKIE', 'rememberMeToken=? AND cookie_expiration > NOW()');
-
-
-// Richiede la tabella su cui fare la query, divide un array in stringhe separate da virgola e le concatena
-// per comporre la select. Richiede una stringa per comporre il where e un array con i tipi di dato da inserire
-// Il primo array può essere un regolare array, il secondo deve essere un array associativo
+// Si aspetta in input un array associativo con i nomi delle colonne e i valori da inserire
+// Opzionalmente può ricevere una condizione da aggiungere al where, attesa nel formato "colonna=? AND colonna2=? ..."
+// ed un array non associativo con i valori con cui fare il bind (in ordine)
 function genericSelect($table, $select_Columns, $where, $toBind, $con)
 {
     $query = "SELECT " . implode(", ", $select_Columns) . " FROM " . $table;
@@ -47,13 +37,14 @@ function genericSelect($table, $select_Columns, $where, $toBind, $con)
     return null;
 }
 
-function insert_data($table, $toInsert, $con)
+// Si aspetta in input un array associativo con i nomi delle colonne e i valori da inserire
+function generic_Insert($table, $toInsert, $con)
 {;
     $columns = array_keys($toInsert);
     $values = array_values($toInsert);
     $types = getTypes($values);
-
     $query = "INSERT INTO " . $table . "(" . implode(", ", $columns) . ") VALUES (" . implode(", ", array_fill(0, count($columns), "?")) . ")";
+   
     $stmt = mysqli_prepare($con, $query);
     check_mysqliFunction($stmt, $con, 'prepare', $query);
 
@@ -67,29 +58,17 @@ function insert_data($table, $toInsert, $con)
     mysqli_stmt_close($stmt);
 }
 
-function delete_user($id, $con)
-{
-    $query = "DELETE FROM users WHERE id=?";
-    check_mysqliFunction($delete_stmt = mysqli_prepare($con, $query), $con, 'prepare', $query);
-    check_mysqliFunction(mysqli_stmt_bind_param($delete_stmt, "i", $id), $con, 'bind', $query);
-    check_mysqliFunction(mysqli_stmt_execute($delete_stmt), $con, 'execute', $query);
-    if (mysqli_stmt_affected_rows($delete_stmt)) {
-        mysqli_stmt_close($delete_stmt);
-        return true;
-    }
-    mysqli_stmt_close($delete_stmt);
-}
-
-function generic_delete($table, $where, $whereBind, $con)
+// Si aspetta in input una stringa corrispondente al where della query,
+// attesa nel formato "colonna=? AND colonna2=? ..."
+// ed un array non associativo con i valori con cui fare il bind (in ordine)
+function generic_Delete($table, $where, $whereBind, $con)
 {
     $query = "DELETE FROM " . $table . " WHERE " . $where;
     $stmt = mysqli_prepare($con, $query);
     check_mysqliFunction($stmt, $con, 'prepare', $query);
 
-    if (!empty($whereBind)) {
-        $values = array_values($whereBind);
-        $types = getTypes($whereBind);
-    }
+    $values = array_values($whereBind);
+    $types = getTypes($whereBind);
     check_mysqliFunction(mysqli_stmt_bind_param($stmt, $types, ...$values), $con, 'bind', $query);
 
     check_mysqliFunction(mysqli_stmt_execute($stmt), $con, 'execute', $query);
@@ -101,7 +80,7 @@ function generic_delete($table, $where, $whereBind, $con)
 
 // Si aspetta in input un array associativo con i nomi delle colonne e i valori da inserire
 // Opzionalmente può ricevere una condizione da aggiungere al where, attesa nel formato "colonna=? AND colonna2=? ..."
-// ed un array non associativo con i valori da inserire nella where (in ordine)
+// ed un array non associativo con i valori con cui fare il bind (in ordine)
 function generic_Update($table, $select_key_value, $where, $whereBind, $con)
 {
     $keys = array_keys($select_key_value);
@@ -109,16 +88,14 @@ function generic_Update($table, $select_key_value, $where, $whereBind, $con)
     $query = isset($where) ? ($query . " WHERE " . $where) : $query;
     check_mysqliFunction($stmt = mysqli_prepare($con, $query), $con, 'prepare', $query);
 
-    if (!empty($select_key_value)) {
-        $values = array_values($select_key_value);
-        $types = getTypes($values);         // Ottengo i tipi di dato associati ai valori sotto forma di stringa
-
+    $values = array_values($select_key_value);
+    $types = getTypes($values);         
         if (!empty($whereBind)) {
             $values = array_merge($values, array_values($whereBind));
             $types = $types . getTypes($whereBind);
         }
-        check_mysqliFunction(mysqli_stmt_bind_param($stmt, $types, ...$values), $con, 'bind', $query);
-    }
+    check_mysqliFunction(mysqli_stmt_bind_param($stmt, $types, ...$values), $con, 'bind', $query);
+    
     check_mysqliFunction(mysqli_stmt_execute($stmt), $con, 'execute', $query);
     if (!mysqli_stmt_affected_rows($stmt))
         throw new Exception("error in '" . $query . "': " . mysqli_error($con));
