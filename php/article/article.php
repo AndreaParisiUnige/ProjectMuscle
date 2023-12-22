@@ -15,7 +15,7 @@ if (isset($_GET['id'])) {
             "<input hidden type=\"text\" id=\"sectionTitle\" value=\"" . $title . "\">" .
             "<div class=\"articleText\">" . $content . "</div>";
         if (check_admin($con)) {
-            echo "<div id='manageArticleButtons'><button class=\"responsive\" id=\"deleteArticle\" onclick=\"deleteArticle('" . $articleId . "')\">Delete</button>";
+            echo "<div id='manageArticleButtons'><button class=\"responsive red\" id=\"deleteArticle\">Delete</button>";
             echo "<button class=\"responsive\" id=\"updateArticle\">Update</button></div>";
         };
 
@@ -30,8 +30,9 @@ require_once "../structure/footer.php";
 
 <script>
     $(document).ready(function() {
+        var articleId = <?php echo $articleId; ?>;
+
         $('#updateArticle').click(function() {
-            var articleId = <?php echo $articleId; ?>;
             var title = `<?php echo $title; ?>`;
             var content = `<?php echo $content; ?>`;
 
@@ -44,6 +45,25 @@ require_once "../structure/footer.php";
 
             localStorage.setItem('articleData', JSON.stringify(dataToSend));
             window.location.href = "../article/addArticle.php?";
+        });
+        
+        $('#deleteArticle').click(function() {
+            if (confirm("Sei sicuro di voler eliminare questo articolo?")) {
+                var dataToSend = {
+                    id : articleId,
+                    table: "articoli",
+                    idName: "articleNum"
+                };
+                $.post("../article/delete.php", dataToSend)
+                    .done(function() {
+                        window.location.href = '../structure/index.php';
+                        alert("Articolo eliminato con successo!");
+                    })
+                    .fail(function() {
+                        alert("Non è possibile eliminare l'articolo");
+                    });
+            }
+
         });
     });
 </script>

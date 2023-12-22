@@ -15,12 +15,10 @@ exitIfNotAdmin($con);
 
 <script>
     $(document).ready(function() {
-        
-var savedData = localStorage.getItem('articleData');
-        if (savedData) {
+        // If present, load the article data from the localStorage
+        var savedData = localStorage.getItem('articleData');
+        if (savedData) 
             var articleData = JSON.parse(savedData);
-            tinymce.get("textarea").setContent(articleData.title + articleData.content);
-        }
 
         let form = document.getElementById("getDataForm");
         form.addEventListener("submit", function(e) {
@@ -38,7 +36,7 @@ var savedData = localStorage.getItem('articleData');
 
                 let dataToSend = {
                     title: titleHtml,
-                    content: contentHtml,                   
+                    content: contentHtml,
                 };
                 if (savedData) {
                     dataToSend.articleNum = articleData.articleNum;

@@ -32,6 +32,7 @@ tinymce.init({
 				}
 			}
 		});
+		// Update the saved data on editor change
 		editor.on('init', function () {
 			var savedData = localStorage.getItem('articleData');
 			if (savedData) {
