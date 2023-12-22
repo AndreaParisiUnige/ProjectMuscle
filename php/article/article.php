@@ -43,7 +43,7 @@ require_once "../structure/footer.php";
             };
 
             localStorage.setItem('articleData', JSON.stringify(dataToSend));
-            window.location.href = "../article/modArticle.php?";
+            window.location.href = "../article/addArticle.php?";
         });
     });
 </script>
