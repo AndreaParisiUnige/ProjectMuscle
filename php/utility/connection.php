@@ -1,10 +1,10 @@
 <?php
 	require_once '../utility/utils.php';
 	set_error_handler("errorHandler");	
-	$servername = "localhost";
-	$username = "root";
-	$password = "";
-	$dbname = "sawdata";
+	$servername = "saw21.dibris.unige.it";
+	$username = "s5202353";
+	$password = "Saw5202353";
+	$dbname = "S5202353";
 
 	try{
     	$con = mysqli_connect($servername, $username, $password, $dbname);
